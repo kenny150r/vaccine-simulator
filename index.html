@@ -234,7 +234,9 @@ footer p { max-width: 90ch; }
 
 <footer>
   <p><b>About the model.</b> This is a simple SIR (susceptible → infected → recovered) model. Each infected ball stays contagious for a fixed time, and the chance of passing it on per bounce is tuned so one case causes about R₀ new cases in a fully susceptible crowd. The vaccine is "all or nothing": each vaccinated person is either fully protected (with probability = efficacy) or not protected at all. The charts use the standard final-size equation for the same model, which assumes a large, well-mixed population. With only ~450 balls the animation is noisier: small outbreaks sometimes die out by luck, which also happens in real life.</p>
-  <p><b>Vaccine risk.</b> Each vaccinated person dies from the vaccine with the chosen probability, before the outbreak starts. The presets use 1 death per million doses, a deliberately pessimistic round number: for most routine vaccines, deaths actually caused by the vaccine are rarer than that. The "risky vaccine" lesson is hypothetical, far riskier than any approved vaccine. With only ~450 balls, a 1-in-a-million risk almost never shows up in the animation; the charts show its effect for a full population.</p>
+  <p><b>Vaccine risk.</b> Each vaccinated person dies from the vaccine with the chosen probability, before the outbreak starts. The measles presets use 1 death per 10 million doses and the other presets use 1 per million. These are deliberately pessimistic round numbers: for most routine vaccines, deaths actually caused by the vaccine are rarer than that. The "risky vaccine" lesson is hypothetical, far riskier than any approved vaccine. With only ~450 balls, risks this small almost never show up in the animation; the charts show their effect for a full population.</p>
+  <p><b>Real measles vaccine (MMR) risks, approximate.</b> In healthy people, no death risk has been established; large safety reviews (including the US Institute of Medicine in 2012) found none. The one clearly vaccine-caused fatal problem is a brain infection from the vaccine strain in people with severely weakened immune systems, who are not supposed to receive this live vaccine. Deaths reported to VAERS (the US vaccine adverse-event reporting system) are unverified reports, not proven cases. Serious but usually non-fatal side effects: febrile seizures in about 1 in 3,000–4,000 doses (frightening, but no lasting harm); low platelet count (ITP) in about 1 in 30,000–40,000 doses, usually clearing up by itself; severe allergic reaction (anaphylaxis) in roughly 1–4 per million doses, treatable and rarely fatal. The vaccine-risk slider counts deaths only, so it does not model these side effects.</p>
+  <p><b>Measles itself, for comparison.</b> About 1–3 deaths per 1,000 cases in high-income countries (far more where malnutrition is common or care is hard to reach); brain inflammation (encephalitis) in about 1 per 1,000 cases; and SSPE, a fatal brain disease that appears years later, in roughly 1 per 1,000–10,000 cases, more often in those infected as babies.</p>
   <p>Preset numbers are rough, commonly cited estimates chosen to show the ideas. They are not forecasts, and real fatality rates vary a lot with age, health care and other factors. This is a teaching tool, not medical advice.</p>
 </footer>
 </div>
@@ -263,11 +265,11 @@ const P = { r0: 15, cov: 0.97, eff: 0.97, cfr: 0.002, vr: 1e-6 };
 
 // vr = chance the vaccine itself kills a vaccinated person (1e-6 = 1 per million doses)
 const PRESETS = [
-  { g: 'Diseases', name: 'Measles · 97% vaccinated', r0: 15, cov: .97, eff: .97, cfr: .002, vr: 1e-6,
-    note: 'Two doses of measles vaccine are about 97% effective. At 97% coverage, measles has nowhere to go.' },
-  { g: 'Diseases', name: 'Measles · 90% vaccinated', r0: 15, cov: .90, eff: .97, cfr: .002, vr: 1e-6,
+  { g: 'Diseases', name: 'Measles · 97% vaccinated', r0: 15, cov: .97, eff: .97, cfr: .002, vr: 1e-7,
+    note: 'Two doses of measles vaccine are about 97% effective. At 97% coverage, measles has nowhere to go. Vaccine risk is set to 1 death per 10 million doses, a generous upper bound; real side-effect rates are listed at the bottom of the page.' },
+  { g: 'Diseases', name: 'Measles · 90% vaccinated', r0: 15, cov: .90, eff: .97, cfr: .002, vr: 1e-7,
     note: 'Same vaccine, just 7 points less coverage. Measles is so contagious that this small slip lets outbreaks through.' },
-  { g: 'Diseases', name: 'Measles · no vaccine', r0: 15, cov: 0, eff: .97, cfr: .002, vr: 1e-6,
+  { g: 'Diseases', name: 'Measles · no vaccine', r0: 15, cov: 0, eff: .97, cfr: .002, vr: 1e-7,
     note: 'Before the vaccine, almost everyone caught measles as a child.' },
   { g: 'Diseases', name: 'Smallpox-like · 80% vaccinated', r0: 5, cov: .80, eff: .95, cfr: .30, vr: 1e-6,
     note: 'A deadly disease with a good vaccine. 80% coverage falls just short of the ~85% needed, so it still spreads.' },
@@ -283,8 +285,8 @@ const PRESETS = [
     note: 'Same disease, 15 more points of coverage. Now the visitors\' infections usually go nowhere.' },
   { g: 'Lessons', name: 'Why most cases can be vaccinated', r0: 4, cov: .90, eff: .70, cfr: .005, vr: 1e-6,
     note: 'When almost everyone is vaccinated, most patients may be vaccinated, yet each unvaccinated person is far more likely to get sick. Compare the two risk tiles.' },
-  { g: 'Lessons', name: 'Vaccine scare · measles at 80%', r0: 15, cov: .80, eff: .97, cfr: .002, vr: 1e-6,
-    note: 'Fear of a 1-in-a-million vaccine risk drives coverage down to 80%. Compare the deaths the vaccine causes with the deaths measles causes.' },
+  { g: 'Lessons', name: 'Vaccine scare · measles at 80%', r0: 15, cov: .80, eff: .97, cfr: .002, vr: 1e-7,
+    note: 'Fear of a vaccine risk well under 1 in 10 million drives coverage down to 80%. Compare the deaths the vaccine causes with the deaths measles causes.' },
   { g: 'Lessons', name: 'What if the vaccine were risky?', r0: 2.5, cov: .70, eff: .90, cfr: .005, vr: 1e-3,
     note: 'A hypothetical vaccine that kills 1 in 1,000 people, far riskier than any approved vaccine. Vaccinating still saves lives up to herd immunity, but past that point each extra dose only adds risk. The line chart marks where total deaths are lowest.' },
 ];
@@ -301,6 +303,7 @@ function fmtCfr(c) {
 }
 function fmtInt(v) { return Math.round(v).toLocaleString('en-US'); }
 function fmtApprox(v) { // 2 significant figures for model estimates
+  if (v > 0 && v < 0.995) return String(+v.toPrecision(1));
   if (v < 100) return fmtInt(v);
   const p = Math.pow(10, Math.floor(Math.log10(v)) - 1);
   return fmtInt(Math.round(v / p) * p);
