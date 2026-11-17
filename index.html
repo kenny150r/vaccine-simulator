@@ -9,7 +9,7 @@
 :root {
   --bg: #f4f5f7; --card: #ffffff; --ink: #14171c; --muted: #5b6470; --line: #e2e5ea; --soft: #eef1f5;
   --accent: #2563eb;
-  --c-unvac: #a3abb6; --c-vac: #3b82f6; --c-inf: #e5484d; --c-rec: #2fa36b; --c-dead: #3f4651;
+  --c-unvac: #a3abb6; --c-vac: #3b82f6; --c-inf: #e5484d; --c-rec: #2fa36b; --c-dead: #3f4651; --c-vxdead: #8b5cf6;
   --c-safe: #cfe3fb; --world: #fbfcfd;
   color-scheme: light;
 }
@@ -17,7 +17,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
     --accent: #6ea0ff;
-    --c-unvac: #6d7683; --c-vac: #4f8ff7; --c-inf: #ff5c61; --c-rec: #37b679; --c-dead: #9aa4b1;
+    --c-unvac: #6d7683; --c-vac: #4f8ff7; --c-inf: #ff5c61; --c-rec: #37b679; --c-dead: #9aa4b1; --c-vxdead: #a78bfa;
     --c-safe: #1d3350; --world: #10141a;
     color-scheme: dark;
   }
@@ -25,7 +25,7 @@
 :root[data-theme="dark"] {
   --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
   --accent: #6ea0ff;
-  --c-unvac: #6d7683; --c-vac: #4f8ff7; --c-inf: #ff5c61; --c-rec: #37b679; --c-dead: #9aa4b1;
+  --c-unvac: #6d7683; --c-vac: #4f8ff7; --c-inf: #ff5c61; --c-rec: #37b679; --c-dead: #9aa4b1; --c-vxdead: #a78bfa;
   --c-safe: #1d3350; --world: #10141a;
   color-scheme: dark;
 }
@@ -158,6 +158,11 @@ footer p { max-width: 90ch; }
         <input type="range" id="cfr" min="0" max="1000" step="1">
         <p class="hint">Share of infected people who die. (Log scale: 0.01% to 50%.)</p>
       </div>
+      <div class="ctl">
+        <label for="vr">Vaccine risk <output id="vrOut"></output></label>
+        <input type="range" id="vr" min="0" max="1000" step="1">
+        <p class="hint">Chance the vaccine itself kills the person who gets it, in deaths per million doses. (Log scale: none to 1 in 100.)</p>
+      </div>
     </section>
 
     <section>
@@ -165,7 +170,7 @@ footer p { max-width: 90ch; }
         <button class="btn primary" id="play">Pause</button>
         <button class="btn" id="restart">Restart</button>
         <div class="seg" role="group" aria-label="Speed">
-          <button data-speed="1">1×</button><button data-speed="2" aria-pressed="true">2×</button><button data-speed="4">4×</button>
+          <button data-speed="1">1×</button><button data-speed="2">2×</button><button data-speed="4" aria-pressed="true">4×</button><button data-speed="8">8×</button>
         </div>
       </div>
       <label class="check"><input type="checkbox" id="reveal"> <span>Reveal which vaccinated people are <em>not</em> protected (shown as hollow rings). In real life you can't tell who they are.</span></label>
@@ -180,7 +185,8 @@ footer p { max-width: 90ch; }
         <span id="ringKey" hidden><i class="dot ring"></i>Vaccinated, not protected</span>
         <span><i class="dot" style="background:var(--c-inf)"></i>Contagious</span>
         <span><i class="dot" style="background:var(--c-rec)"></i>Recovered</span>
-        <span><i class="dot" style="background:var(--c-dead)"></i>Died</span>
+        <span><i class="dot" style="background:var(--c-dead)"></i>Died of disease</span>
+        <span><i class="dot" style="background:var(--c-vxdead)"></i>Died from vaccine</span>
       </div>
       <div class="clock" id="clock">Day 0</div>
     </div>
@@ -212,7 +218,7 @@ footer p { max-width: 90ch; }
   <p class="callout" id="callout"></p>
   <div class="grid2">
     <div class="card">
-      <h3>Deaths per million people vs. vaccination rate</h3>
+      <h3>Total deaths per million (disease + vaccine) vs. vaccination rate</h3>
       <div class="keyrow" id="lineKey"></div>
       <canvas class="chart" id="lineChart" aria-label="Deaths per million versus vaccination rate"></canvas>
       <p class="cap" id="lineCap">Hover or tap to read values. Click to set the vaccination rate.</p>
@@ -228,6 +234,7 @@ footer p { max-width: 90ch; }
 
 <footer>
   <p><b>About the model.</b> This is a simple SIR (susceptible → infected → recovered) model. Each infected ball stays contagious for a fixed time, and the chance of passing it on per bounce is tuned so one case causes about R₀ new cases in a fully susceptible crowd. The vaccine is "all or nothing": each vaccinated person is either fully protected (with probability = efficacy) or not protected at all. The charts use the standard final-size equation for the same model, which assumes a large, well-mixed population. With only ~450 balls the animation is noisier: small outbreaks sometimes die out by luck, which also happens in real life.</p>
+  <p><b>Vaccine risk.</b> Each vaccinated person dies from the vaccine with the chosen probability, before the outbreak starts. The presets use 1 death per million doses, a deliberately pessimistic round number: for most routine vaccines, deaths actually caused by the vaccine are rarer than that. The "risky vaccine" lesson is hypothetical, far riskier than any approved vaccine. With only ~450 balls, a 1-in-a-million risk almost never shows up in the animation; the charts show its effect for a full population.</p>
   <p>Preset numbers are rough, commonly cited estimates chosen to show the ideas. They are not forecasts, and real fatality rates vary a lot with age, health care and other factors. This is a teaching tool, not medical advice.</p>
 </footer>
 </div>
@@ -252,27 +259,34 @@ const CFR_MIN = 1e-4, CFR_MAX = 0.5;
 const $ = id => document.getElementById(id);
 
 // ---------- parameters & presets ----------
-const P = { r0: 15, cov: 0.97, eff: 0.97, cfr: 0.002 };
+const P = { r0: 15, cov: 0.97, eff: 0.97, cfr: 0.002, vr: 1e-6 };
 
+// vr = chance the vaccine itself kills a vaccinated person (1e-6 = 1 per million doses)
 const PRESETS = [
-  { g: 'Diseases', name: 'Measles · 97% vaccinated', r0: 15, cov: .97, eff: .97, cfr: .002,
+  { g: 'Diseases', name: 'Measles · 97% vaccinated', r0: 15, cov: .97, eff: .97, cfr: .002, vr: 1e-6,
     note: 'Two doses of measles vaccine are about 97% effective. At 97% coverage, measles has nowhere to go.' },
-  { g: 'Diseases', name: 'Measles · 90% vaccinated', r0: 15, cov: .90, eff: .97, cfr: .002,
+  { g: 'Diseases', name: 'Measles · 90% vaccinated', r0: 15, cov: .90, eff: .97, cfr: .002, vr: 1e-6,
     note: 'Same vaccine, just 7 points less coverage. Measles is so contagious that this small slip lets outbreaks through.' },
-  { g: 'Diseases', name: 'Measles · no vaccine', r0: 15, cov: 0, eff: .97, cfr: .002,
+  { g: 'Diseases', name: 'Measles · no vaccine', r0: 15, cov: 0, eff: .97, cfr: .002, vr: 1e-6,
     note: 'Before the vaccine, almost everyone caught measles as a child.' },
-  { g: 'Diseases', name: 'Smallpox-like · 80% vaccinated', r0: 5, cov: .80, eff: .95, cfr: .30,
+  { g: 'Diseases', name: 'Smallpox-like · 80% vaccinated', r0: 5, cov: .80, eff: .95, cfr: .30, vr: 1e-6,
     note: 'A deadly disease with a good vaccine. 80% coverage falls just short of the ~85% needed, so it still spreads.' },
-  { g: 'Diseases', name: 'COVID-like · no vaccine', r0: 2.8, cov: 0, eff: .9, cfr: .01,
+  { g: 'Diseases', name: 'COVID-like · no vaccine', r0: 2.8, cov: 0, eff: .9, cfr: .01, vr: 1e-6,
     note: 'An early-2020-style scenario with no vaccine and no other precautions. A modest R₀ still infects most people.' },
-  { g: 'Diseases', name: 'Seasonal flu', r0: 1.3, cov: .5, eff: .4, cfr: .001,
+  { g: 'Diseases', name: 'COVID-like · 70% vaccinated', r0: 2.8, cov: .70, eff: .9, cfr: .01, vr: 1e-6,
+    note: 'The same disease with a 90% effective vaccine given to 70% of people. That\'s just short of herd immunity, yet deaths fall by over 95%.' },
+  { g: 'Diseases', name: 'Seasonal flu', r0: 1.3, cov: .5, eff: .4, cfr: .001, vr: 1e-6,
     note: 'Flu vaccines are only moderately effective, but flu also spreads slowly, so even partial protection helps.' },
-  { g: 'Lessons', name: 'Tipping point · 75% vaccinated', r0: 4, cov: .75, eff: .90, cfr: .01,
-    note: 'With R₀ = 4 and a 90% effective vaccine, herd immunity needs 83% coverage. At 75%, the outbreak spreads.' },
-  { g: 'Lessons', name: 'Tipping point · 90% vaccinated', r0: 4, cov: .90, eff: .90, cfr: .01,
+  { g: 'Lessons', name: 'Tipping point · 75% vaccinated', r0: 4, cov: .75, eff: .90, cfr: .01, vr: 1e-6,
+    note: 'With R₀ = 4 and a 90% effective vaccine, herd immunity needs 84% coverage. At 75%, the outbreak spreads.' },
+  { g: 'Lessons', name: 'Tipping point · 90% vaccinated', r0: 4, cov: .90, eff: .90, cfr: .01, vr: 1e-6,
     note: 'Same disease, 15 more points of coverage. Now the visitors\' infections usually go nowhere.' },
-  { g: 'Lessons', name: 'Why most cases can be vaccinated', r0: 4, cov: .90, eff: .70, cfr: .005,
+  { g: 'Lessons', name: 'Why most cases can be vaccinated', r0: 4, cov: .90, eff: .70, cfr: .005, vr: 1e-6,
     note: 'When almost everyone is vaccinated, most patients may be vaccinated, yet each unvaccinated person is far more likely to get sick. Compare the two risk tiles.' },
+  { g: 'Lessons', name: 'Vaccine scare · measles at 80%', r0: 15, cov: .80, eff: .97, cfr: .002, vr: 1e-6,
+    note: 'Fear of a 1-in-a-million vaccine risk drives coverage down to 80%. Compare the deaths the vaccine causes with the deaths measles causes.' },
+  { g: 'Lessons', name: 'What if the vaccine were risky?', r0: 2.5, cov: .70, eff: .90, cfr: .005, vr: 1e-3,
+    note: 'A hypothetical vaccine that kills 1 in 1,000 people, far riskier than any approved vaccine. Vaccinating still saves lives up to herd immunity, but past that point each extra dose only adds risk. The line chart marks where total deaths are lowest.' },
 ];
 let activePreset = 0;
 
@@ -299,6 +313,21 @@ function fmtBig(v) {
 }
 const cfrToSlider = c => Math.round(1000 * Math.log(c / CFR_MIN) / Math.log(CFR_MAX / CFR_MIN));
 const sliderToCfr = t => CFR_MIN * Math.pow(CFR_MAX / CFR_MIN, t / 1000);
+// vaccine risk slider: 0 = none, then log scale 0.01 .. 10,000 per million doses
+const VR_MIN = 1e-8, VR_MAX = 1e-2;
+const vrToSlider = v => v <= 0 ? 0 : Math.max(1, Math.round(1000 * Math.log(v / VR_MIN) / Math.log(VR_MAX / VR_MIN)));
+const sliderToVr = t => t <= 0 ? 0 : VR_MIN * Math.pow(VR_MAX / VR_MIN, t / 1000);
+function fmtVr(v) {
+  if (v <= 0) return 'none';
+  const m = v * 1e6;
+  const n = m >= 100 ? fmtApprox(m) : m >= 10 ? Math.round(m).toString() : m >= 1 ? String(+m.toFixed(1)) : String(+m.toPrecision(1));
+  return n + ' per million';
+}
+function oneIn(p) { // "1 in 2,300"
+  if (p <= 0) return 'about zero';
+  if (p >= 0.5) return pct0(p);
+  return '1 in ' + fmtApprox(1 / p);
+}
 
 // ---------- theory (final-size equation) ----------
 // Fraction of the whole population infected in a large well-mixed population.
@@ -315,24 +344,33 @@ function finalSize(r0, s0) {
   }
   return z;
 }
-function theory(r0, cov, eff, cfr) {
+function theory(r0, cov, eff, cfr, vr = P.vr) {
   const s0 = 1 - cov * eff;
   const z = finalSize(r0, s0);
   const attack = s0 > 0 ? z / s0 : 0;          // infection prob. for a susceptible person
   const riskU = attack, riskV = (1 - eff) * attack;
   const hit = r0 > 1 ? (1 - 1 / r0) / eff : 0; // coverage needed for herd immunity
-  return { s0, reff: r0 * s0, z, riskU, riskV, hit, deathsPerM: z * cfr * 1e6 };
+  const diseaseDeathsPerM = z * cfr * 1e6, vaxDeathsPerM = cov * vr * 1e6;
+  return { s0, reff: r0 * s0, z, riskU, riskV, hit, diseaseDeathsPerM, vaxDeathsPerM,
+           deathsPerM: diseaseDeathsPerM + vaxDeathsPerM,
+           dieU: riskU * cfr, dieV: vr + (1 - vr) * riskV * cfr };   // personal chance of dying
+}
+// Coverage (0..1) with the fewest total deaths for the current settings.
+function bestCoverage(eff) {
+  let best = 0, bestV = Infinity;
+  for (let k = 0; k <= 1000; k++) { const v = theory(P.r0, k / 1000, eff, P.cfr).deathsPerM; if (v < bestV - 1e-9) { bestV = v; best = k / 1000; } }
+  return { cov: best, deathsPerM: bestV };
 }
 
 // ---------- simulation state ----------
 const x = new Float32Array(N), y = new Float32Array(N), vx = new Float32Array(N), vy = new Float32Array(N);
 const st = new Uint8Array(N);   // 0 healthy, 1 contagious, 2 recovered, 3 dead
-const vac = new Uint8Array(N), prot = new Uint8Array(N), die = new Uint8Array(N);
+const vac = new Uint8Array(N), prot = new Uint8Array(N), die = new Uint8Array(N), vxd = new Uint8Array(N); // vxd: died from vaccine
 const tInf = new Float32Array(N), dur = new Float32Array(N);
 const head = new Int32Array(GC * GR), nextI = new Int32Array(N);
 const S = { time: 0, D: 1, lam: 1, dayLen: 1, done: false, hist: [], lastSample: -1,
-            nVac: 0, nUnvac: 0, infVac: 0, infUnvac: 0, deaths: 0, peak: 0, contacts: 0 };
-let running = true, speed = 2, reveal = false;
+            nVac: 0, nUnvac: 0, infVac: 0, infUnvac: 0, deaths: 0, vaxDeaths: 0, peak: 0, contacts: 0 };
+let running = true, speed = 4, reveal = false;
 
 function rand() { return Math.random(); }
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = (rand() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -354,13 +392,19 @@ function reset() {
     x[i] = px; y[i] = py;
     const a = rand() * Math.PI * 2;
     vx[i] = Math.cos(a) * SPEED; vy[i] = Math.sin(a) * SPEED;
-    st[i] = 0; vac[i] = 0; prot[i] = 0; die[i] = 0; tInf[i] = 0; dur[i] = 0;
+    st[i] = 0; vac[i] = 0; prot[i] = 0; die[i] = 0; vxd[i] = 0; tInf[i] = 0; dur[i] = 0;
   }
   // indices 0..SEEDS-1 are unvaccinated visitors who arrive contagious
   const idx = shuffle(Array.from({ length: POP }, (_, k) => k + SEEDS));
   const nv = Math.round(P.cov * POP), np = Math.round(P.eff * nv);
   for (let k = 0; k < nv; k++) { vac[idx[k]] = 1; if (k < np) prot[idx[k]] = 1; }
   S.nVac = nv; S.nUnvac = POP - nv;
+  // the vaccine itself kills a vaccinated person with probability P.vr
+  S.vaxDeaths = 0;
+  for (let k = 0; k < nv; k++) {
+    const i = idx[k];
+    if (rand() < P.vr) { st[i] = 3; vxd[i] = 1; vx[i] = 0; vy[i] = 0; S.vaxDeaths++; }
+  }
 
   S.lam = analyticLambda(N);
   S.D = CT / S.lam;
@@ -446,13 +490,13 @@ function step(dt) {
 }
 
 function counts() {
-  let inf = 0, rec = 0, dead = 0, hu = 0, hv = 0;
+  let inf = 0, rec = 0, dead = 0, vdead = 0, hu = 0, hv = 0;
   for (let i = SEEDS; i < N; i++) {
     const s = st[i];
-    if (s === 1) inf++; else if (s === 2) rec++; else if (s === 3) dead++;
+    if (s === 1) inf++; else if (s === 2) rec++; else if (s === 3) { if (vxd[i]) vdead++; else dead++; }
     else if (vac[i]) hv++; else hu++;
   }
-  return { inf, rec, dead, hu, hv };
+  return { inf, rec, dead, vdead, hu, hv };
 }
 function sample() {
   const c = counts();
@@ -465,12 +509,12 @@ function finish() {
   const tot = S.infVac + S.infUnvac;
   const day = Math.max(1, Math.round(S.time / S.dayLen));
   const title = tot <= 3 ? 'The outbreak fizzled out' : `Outbreak over after ${day} days`;
-  let text = `${tot} of ${POP} people were infected (${pct0(tot / POP)}), and ${S.deaths} died.`;
+  let text = `${tot} of ${POP} people were infected (${pct0(tot / POP)}), and ${S.deaths} died of the disease` + (S.vaxDeaths ? `; ${S.vaxDeaths} died from the vaccine.` : '.');
   if (S.nUnvac > 0 && S.nVac > 0 && tot > 0) {
     text += ` ${pct0(S.infUnvac / S.nUnvac)} of unvaccinated people got sick vs ${pct0(S.infVac / S.nVac)} of vaccinated people.`;
   }
   const th = theory(P.r0, P.cov, P.eff, P.cfr);
-  text += ` In a city of 1 million, the model predicts about ${fmtApprox(th.deathsPerM)} deaths.`;
+  text += ` In a city of 1 million, the model predicts about ${fmtApprox(th.diseaseDeathsPerM)} deaths from the disease and ${fmtApprox(th.vaxDeathsPerM)} from the vaccine.`;
   $('bannerTitle').textContent = title;
   $('bannerText').textContent = text;
   $('banner').hidden = false;
@@ -481,8 +525,8 @@ function updateTiles() {
   const tot = S.infVac + S.infUnvac;
   $('tInf').textContent = fmtInt(tot);
   $('tInfS').textContent = pct0(tot / POP) + ' of ' + POP + ' people';
-  $('tDead').textContent = fmtInt(S.deaths);
-  $('tDeadS').textContent = 'CFR ' + fmtCfr(P.cfr);
+  $('tDead').textContent = fmtInt(S.deaths + S.vaxDeaths);
+  $('tDeadS').textContent = `${S.deaths} disease · ${S.vaxDeaths} vaccine`;
   const th = theory(P.r0, P.cov, P.eff, P.cfr);
   const tr = $('tReff');
   tr.textContent = th.reff.toFixed(2);
@@ -506,7 +550,7 @@ function updateTiles() {
 let C = {};
 function readColors() {
   const cs = getComputedStyle(document.documentElement);
-  for (const k of ['bg', 'card', 'ink', 'muted', 'line', 'soft', 'accent', 'c-unvac', 'c-vac', 'c-inf', 'c-rec', 'c-dead', 'c-safe', 'world'])
+  for (const k of ['bg', 'card', 'ink', 'muted', 'line', 'soft', 'accent', 'c-unvac', 'c-vac', 'c-inf', 'c-rec', 'c-dead', 'c-vxdead', 'c-safe', 'world'])
     C[k] = cs.getPropertyValue('--' + k).trim();
 }
 function sizeCanvas(cv, cssW, cssH) {
@@ -551,14 +595,17 @@ function drawWorld() {
     for (let i = 0; i < N; i++) if (st[i] === 0 && vac[i] && !prot[i]) { ctx.moveTo(x[i] * s + rr, y[i] * s); ctx.arc(x[i] * s, y[i] * s, rr, 0, 6.2832); }
     ctx.stroke();
   }
-  // dead: small cross
-  ctx.strokeStyle = C['c-dead']; ctx.lineWidth = Math.max(1.2, r * 0.35); ctx.lineCap = 'round'; ctx.beginPath();
+  // dead: small cross (disease) / purple cross (vaccine)
+  ctx.lineWidth = Math.max(1.2, r * 0.35); ctx.lineCap = 'round';
   const k = r * 0.8;
-  for (let i = 0; i < N; i++) if (st[i] === 3) {
-    const px = x[i] * s, py = y[i] * s;
-    ctx.moveTo(px - k, py - k); ctx.lineTo(px + k, py + k); ctx.moveTo(px + k, py - k); ctx.lineTo(px - k, py + k);
+  for (const [flag, col] of [[0, C['c-dead']], [1, C['c-vxdead']]]) {
+    ctx.strokeStyle = col; ctx.beginPath();
+    for (let i = 0; i < N; i++) if (st[i] === 3 && vxd[i] === flag) {
+      const px = x[i] * s, py = y[i] * s;
+      ctx.moveTo(px - k, py - k); ctx.lineTo(px + k, py + k); ctx.moveTo(px + k, py - k); ctx.lineTo(px - k, py + k);
+    }
+    ctx.stroke();
   }
-  ctx.stroke();
 }
 
 // epidemic curve (stacked area)
@@ -572,7 +619,7 @@ function drawCurve() {
   const tMax = Math.max(S.dayLen * 40, hist[hist.length - 1].t);
   const X = t => padL + (t / tMax) * pw;
   const Y = v => 4 + ph - (v / POP) * ph;
-  const layers = [['inf', C['c-inf']], ['dead', C['c-dead']], ['rec', C['c-rec']], ['hu', C['c-unvac']], ['hv', C['c-vac']]];
+  const layers = [['inf', C['c-inf']], ['dead', C['c-dead']], ['vdead', C['c-vxdead']], ['rec', C['c-rec']], ['hu', C['c-unvac']], ['hv', C['c-vac']]];
   const base = new Float32Array(hist.length);
   for (const [key, col] of layers) {
     ctx.beginPath();
@@ -608,13 +655,15 @@ function drawLine() {
   const padL = 48, padR = 10, padT = 10, padB = 30;
   const pw = w - padL - padR, ph = h - padT - padB;
   const set = effSet();
-  const yMax0 = theory(P.r0, 0, 1, P.cfr).deathsPerM;
-  const yMax = niceMax(yMax0 || 1);
+  let yMax0 = 0;
+  for (const o of set) for (let k = 0; k <= 50; k++) yMax0 = Math.max(yMax0, theory(P.r0, k / 50, o.e / 100, P.cfr).deathsPerM);
+  const yStep = niceStep((yMax0 || 1) / 4), yTicks = Math.max(1, Math.ceil((yMax0 || 1) / yStep - 1e-9));
+  const yMax = yStep * yTicks;
   const X = c => padL + c * pw, Y = v => padT + ph - (v / yMax) * ph;
   // grid
   ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.fillStyle = C.muted; ctx.font = '11px system-ui, sans-serif';
   ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  for (let k = 0; k <= 4; k++) { const v = yMax * k / 4, yy = Math.round(Y(v)) + .5; ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(w - padR, yy); ctx.stroke(); ctx.fillText(fmtBig(v), padL - 6, yy); }
+  for (let k = 0; k <= yTicks; k++) { const v = yStep * k, yy = Math.round(Y(v)) + .5; ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(w - padR, yy); ctx.stroke(); ctx.fillText(fmtBig(v), padL - 6, yy); }
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   for (let c = 0; c <= 100; c += 20) ctx.fillText(c + '%', X(c / 100), h - padB + 6);
   ctx.fillText('vaccination rate', padL + pw / 2, h - 13);
@@ -637,6 +686,23 @@ function drawLine() {
     ctx.lineWidth = o.main ? 2.5 : 1.6; ctx.stroke();
   });
   ctx.setLineDash([]); ctx.globalAlpha = 1;
+  // deaths caused by the vaccine alone
+  const showVax = P.vr * 1e6 > yMax * 0.01;
+  if (showVax) {
+    ctx.strokeStyle = C['c-vxdead']; ctx.lineWidth = 1.8; ctx.setLineDash([2, 3]);
+    ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(1), Y(P.vr * 1e6)); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // fewest total deaths (only interesting when the vaccine has a risk)
+  const best = bestCoverage(P.eff);
+  const showBest = P.vr > 0 && best.cov < 0.995 && theory(P.r0, 1, P.eff, P.cfr).deathsPerM - best.deathsPerM > yMax * 0.005;
+  if (showBest) {
+    ctx.strokeStyle = C['c-rec']; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(X(best.cov), Y(best.deathsPerM), 8, 0, 6.2832); ctx.stroke();
+    ctx.fillStyle = C['c-rec']; ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'bottom';
+    ctx.textAlign = X(best.cov) > padL + pw - 60 ? 'right' : 'left';
+    ctx.fillText('fewest deaths', X(best.cov) + (ctx.textAlign === 'right' ? -4 : 4), Y(best.deathsPerM) - 10);
+    ctx.font = '11px system-ui, sans-serif';
+  }
   // current point
   const cy = th.deathsPerM;
   ctx.strokeStyle = C.ink; ctx.globalAlpha = .35; ctx.beginPath(); ctx.moveTo(Math.round(X(P.cov)) + .5, padT); ctx.lineTo(Math.round(X(P.cov)) + .5, padT + ph); ctx.stroke(); ctx.globalAlpha = 1;
@@ -648,17 +714,21 @@ function drawLine() {
     ctx.strokeStyle = C.muted; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(X(c), padT); ctx.lineTo(X(c), padT + ph); ctx.stroke(); ctx.setLineDash([]);
     for (const o of set) { const v = theory(P.r0, c, o.e / 100, P.cfr).deathsPerM; ctx.fillStyle = o.main ? C.accent : (o.up ? C['c-rec'] : C.muted); ctx.beginPath(); ctx.arc(X(c), Y(v), 3.5, 0, 6.2832); ctx.fill(); }
-    const parts = set.map(o => `${o.e}% efficacy: ${fmtInt(theory(P.r0, c, o.e / 100, P.cfr).deathsPerM)}`);
-    $('lineCap').textContent = `At ${Math.round(c * 100)}% vaccinated → deaths per million · ` + parts.join(' · ');
+    const tm = theory(P.r0, c, P.eff, P.cfr);
+    const parts = set.filter(o => !o.main).map(o => `${o.e}%: ${fmtInt(theory(P.r0, c, o.e / 100, P.cfr).deathsPerM)}`);
+    $('lineCap').textContent = `At ${Math.round(c * 100)}% vaccinated → ${fmtInt(tm.deathsPerM)} deaths per million at ${Math.round(P.eff * 100)}% efficacy` +
+      (P.vr > 0 ? ` (${fmtInt(tm.diseaseDeathsPerM)} disease + ${fmtInt(tm.vaxDeathsPerM)} vaccine)` : '') +
+      (parts.length ? ' · other efficacies ' + parts.join(' · ') : '');
   } else {
     $('lineCap').textContent = 'Hover or tap to read values. Click to set the vaccination rate.';
   }
   // key
-  $('lineKey').innerHTML = set.map(o => `<span style="color:${o.main ? C.accent : (o.up ? C['c-rec'] : C.muted)}"><i class="${o.main ? '' : 'd'}"></i><span style="color:${C.muted}">${o.e}% efficacy${o.main ? ' (current)' : ''}</span></span>`).join('');
+  $('lineKey').innerHTML = set.map(o => `<span style="color:${o.main ? C.accent : (o.up ? C['c-rec'] : C.muted)}"><i class="${o.main ? '' : 'd'}"></i><span style="color:${C.muted}">${o.e}% efficacy${o.main ? ' (current)' : ''}</span></span>`).join('') +
+    (showVax ? `<span style="color:${C['c-vxdead']}"><i class="d"></i><span style="color:${C.muted}">caused by vaccine</span></span>` : '');
 }
-function niceMax(v) {
+function niceStep(v) {
   const p = Math.pow(10, Math.floor(Math.log10(v)));
-  for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+  for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
   return 10 * p;
 }
 
@@ -752,7 +822,8 @@ function updateCallout() {
   } else {
     if (th.hit > 1) parts.push(`With R₀ = ${r0s} and a ${pct0(P.eff)} effective vaccine, <b>even vaccinating everyone can't reach herd immunity</b>. You'd need a vaccine at least ${Math.ceil((1 - 1 / P.r0) * 100)}% effective.`);
     else parts.push(`With R₀ = ${r0s} and a ${pct0(P.eff)} effective vaccine, herd immunity needs <b>at least ${Math.ceil(th.hit * 100)}% vaccinated</b>. You're at ${pct0(P.cov)}.`);
-    parts.push(`In a city of 1 million, the model predicts <b>~${fmtApprox(th.z * 1e6)} infections and ~${fmtApprox(th.deathsPerM)} deaths</b>.`);
+    parts.push(`In a city of 1 million, the model predicts <b>~${fmtApprox(th.z * 1e6)} infections and ~${fmtApprox(th.diseaseDeathsPerM)} deaths from the disease</b>` +
+      (P.cov > 0 && P.vr > 0 ? `, plus <b>~${fmtApprox(th.vaxDeathsPerM)} from the vaccine</b>.` : '.'));
     const alt = [];
     const c5 = Math.max(0, P.cov - .05), e10 = Math.max(0, P.eff - .10);
     const tc = theory(P.r0, c5, P.eff, P.cfr), te = theory(P.r0, P.cov, e10, P.cfr), t0 = theory(P.r0, 0, P.eff, P.cfr);
@@ -765,15 +836,32 @@ function updateCallout() {
     if (P.cov > 0) alt.push(`5 points less coverage (${pct0(c5)}) → ${delta(th.deathsPerM, tc.deathsPerM)}`);
     if (P.cov > 0 && P.eff > 0) alt.push(`a vaccine 10 points less effective (${pct0(e10)}) → ${delta(th.deathsPerM, te.deathsPerM)}`);
     if (P.cov > 0) alt.push(`no vaccination at all → <b>${fmtInt(t0.deathsPerM)}</b>`);
-    if (alt.length) parts.push('Deaths per million with ' + alt.join('; ') + '.');
+    if (alt.length) parts.push('Total deaths per million with ' + alt.join('; ') + '.');
+    // vaccine benefit vs. harm
+    if (P.cov > 0 && P.vr > 0) {
+      const prevented = t0.diseaseDeathsPerM - th.diseaseDeathsPerM, caused = th.vaxDeathsPerM;
+      if (prevented > caused) {
+        const ratio = prevented / caused;
+        parts.push(`The vaccine prevents ~${fmtApprox(prevented)} deaths per million and causes ~${fmtApprox(caused)}: <b>${ratio >= 100 ? fmtApprox(ratio) : ratio.toFixed(1)} lives saved for every death it causes</b>.`);
+      } else {
+        parts.push(`<b>Here the vaccine does more harm than good</b>: it causes ~${fmtApprox(caused)} deaths per million and prevents only ~${fmtApprox(Math.max(0, prevented))}.`);
+      }
+      const best = bestCoverage(P.eff);
+      if (best.cov < P.cov - 0.01) parts.push(`Total deaths are lowest at about ${pct0(best.cov)} vaccinated; beyond that, extra doses add more risk than protection.`);
+    }
+    // personal risk
+    if (P.cov > 0 && P.cov < 1) {
+      parts.push(`For one person, the chance of dying is <b>${oneIn(th.dieU)} if unvaccinated</b> vs <b>${oneIn(th.dieV)} if vaccinated</b>.`);
+      if (th.z <= 0 && t0.z > 0) parts.push('Unvaccinated people are safe here only because enough others are vaccinated. If everyone skipped the vaccine, the risk would jump to ' + oneIn(t0.dieU) + '.');
+    }
   }
   $('callout').innerHTML = parts.join(' ');
 }
 
 // ---------- controls ----------
-const els = { r0: $('r0'), cov: $('cov'), eff: $('eff'), cfr: $('cfr') };
+const els = { r0: $('r0'), cov: $('cov'), eff: $('eff'), cfr: $('cfr'), vr: $('vr') };
 function syncSliders() {
-  els.r0.value = P.r0; els.cov.value = Math.round(P.cov * 100); els.eff.value = Math.round(P.eff * 100); els.cfr.value = cfrToSlider(P.cfr);
+  els.r0.value = P.r0; els.cov.value = Math.round(P.cov * 100); els.eff.value = Math.round(P.eff * 100); els.cfr.value = cfrToSlider(P.cfr); els.vr.value = vrToSlider(P.vr);
   syncOutputs();
 }
 function syncOutputs() {
@@ -781,12 +869,14 @@ function syncOutputs() {
   $('covOut').textContent = pct0(P.cov);
   $('effOut').textContent = pct0(P.eff);
   $('cfrOut').textContent = fmtCfr(P.cfr);
+  $('vrOut').textContent = fmtVr(P.vr);
 }
 function readSlider(k) {
   if (k === 'r0') P.r0 = +els.r0.value;
   else if (k === 'cov') P.cov = els.cov.value / 100;
   else if (k === 'eff') P.eff = els.eff.value / 100;
   else if (k === 'cfr') P.cfr = sliderToCfr(+els.cfr.value);
+  else if (k === 'vr') P.vr = sliderToVr(+els.vr.value);
 }
 function refreshAnalysis() { syncOutputs(); updateCallout(); drawLine(); drawHeat(); updateTiles(); }
 
@@ -797,7 +887,7 @@ function setPresetUI() {
 function applyPreset(i) {
   activePreset = i;
   const p = PRESETS[i];
-  Object.assign(P, { r0: p.r0, cov: p.cov, eff: p.eff, cfr: p.cfr });
+  Object.assign(P, { r0: p.r0, cov: p.cov, eff: p.eff, cfr: p.cfr, vr: p.vr });
   syncSliders(); setPresetUI(); reset(); refreshAnalysis(); setRunning(true);
 }
 function buildPresets() {
@@ -820,7 +910,7 @@ function buildPresets() {
 for (const k of Object.keys(els)) {
   els[k].addEventListener('input', () => { readSlider(k); activePreset = -1; setPresetUI(); refreshAnalysis(); });
   // vaccination settings need a fresh population; R0 and CFR apply live
-  els[k].addEventListener('change', () => { if (k === 'cov' || k === 'eff') { reset(); setRunning(true); } refreshAnalysis(); });
+  els[k].addEventListener('change', () => { if (k === 'cov' || k === 'eff' || k === 'vr') { reset(); setRunning(true); } refreshAnalysis(); });
 }
 
 function setRunning(v) { running = v; $('play').textContent = v ? 'Pause' : 'Play'; }
