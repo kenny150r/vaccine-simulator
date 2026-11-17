@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Herd Immunity Simulator</title>
+<meta name="description" content="Bouncing-ball outbreak simulator: see how vaccination coverage, vaccine efficacy, R0 and case fatality rate decide whether a disease fizzles or spreads.">
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #14171c; --muted: #5b6470; --line: #e2e5ea; --soft: #eef1f5;
+  --accent: #2563eb;
+  --c-unvac: #a3abb6; --c-vac: #3b82f6; --c-inf: #e5484d; --c-rec: #2fa36b; --c-dead: #3f4651;
+  --c-safe: #cfe3fb; --world: #fbfcfd;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
+    --accent: #6ea0ff;
+    --c-unvac: #6d7683; --c-vac: #4f8ff7; --c-inf: #ff5c61; --c-rec: #37b679; --c-dead: #9aa4b1;
+    --c-safe: #1d3350; --world: #10141a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
+  --accent: #6ea0ff;
+  --c-unvac: #6d7683; --c-vac: #4f8ff7; --c-inf: #ff5c61; --c-rec: #37b679; --c-dead: #9aa4b1;
+  --c-safe: #1d3350; --world: #10141a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+header { padding: 28px 0 12px; }
+h1 { font-size: clamp(24px, 3.4vw, 34px); line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.02em; }
+.lede { margin: 0; color: var(--muted); max-width: 72ch; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 650; }
+h3 { font-size: 15px; margin: 0 0 4px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+
+.layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; align-items: start; padding-bottom: 16px; }
+@media (max-width: 920px) { .layout { grid-template-columns: minmax(0, 1fr); } .stage { order: -1; } }
+
+/* controls */
+.controls section + section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.presets { display: flex; flex-direction: column; gap: 10px; }
+.pgroup-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.pbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.pbtn {
+  font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--soft); color: var(--ink);
+}
+.pbtn:hover { border-color: var(--accent); }
+.pbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.note { font-size: 13px; color: var(--muted); margin: 10px 0 0; min-height: 1.5em; }
+.ctl + .ctl { margin-top: 14px; }
+.ctl label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 600; font-size: 14px; }
+.ctl output { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); font-size: 16px; }
+.ctl input[type=range] { width: 100%; margin: 6px 0 2px; accent-color: var(--accent); }
+.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+.playbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--soft); color: var(--ink);
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:hover { filter: brightness(1.05); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-left: auto; }
+.seg button { font: inherit; font-size: 13px; padding: 7px 10px; border: 0; background: var(--soft); color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--muted); margin-top: 12px; cursor: pointer; }
+.check input { margin-top: 3px; accent-color: var(--accent); }
+
+/* stage */
+.simhead { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.dot.ring { background: transparent !important; border: 2px solid var(--c-vac); }
+.clock { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.canvas-wrap { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--world); }
+#world { display: block; width: 100%; height: auto; }
+.banner {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(460px, calc(100% - 24px)); background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.18); text-align: center;
+}
+.banner[hidden] { display: none; }
+.banner h3 { font-size: 17px; margin-bottom: 4px; }
+.banner p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { background: var(--soft); border-radius: 10px; padding: 9px 11px; min-width: 0; }
+.tile .k { font-size: 12px; color: var(--muted); }
+.tile .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.tile .s { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v.bad { color: var(--c-inf); } .v.good { color: var(--c-rec); }
+.curve-wrap { margin-top: 12px; }
+.curve-wrap canvas { display: block; width: 100%; height: 130px; }
+.subtle { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+
+/* analysis */
+.analysis { padding: 8px 0 16px; }
+.analysis > h2 { font-size: clamp(20px, 2.6vw, 26px); text-transform: none; letter-spacing: -0.01em; color: var(--ink); margin: 16px 0 6px; }
+.callout { font-size: 16px; max-width: 80ch; margin: 0 0 14px; }
+.callout b { font-variant-numeric: tabular-nums; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 920px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.chart { display: block; width: 100%; height: 300px; cursor: crosshair; touch-action: pan-y; }
+.cap { font-size: 13px; color: var(--muted); margin: 8px 0 0; min-height: 1.5em; font-variant-numeric: tabular-nums; }
+.keyrow { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
+.keyrow i { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid currentColor; vertical-align: middle; margin-right: 5px; }
+.keyrow i.d { border-top-style: dashed; }
+footer { color: var(--muted); font-size: 13px; padding: 8px 0 40px; }
+footer p { max-width: 90ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Herd Immunity Simulator</h1>
+  <p class="lede">Every ball is a person. Red balls are contagious, and each bounce is a chance to pass it on. Change how many people are vaccinated and how well the vaccine works, and watch an outbreak fizzle out or spread through everyone.</p>
+</header>
+
+<main class="layout">
+  <aside class="controls card" aria-label="Simulation controls">
+    <section>
+      <h2>Presets</h2>
+      <div class="presets" id="presets"></div>
+      <p class="note" id="presetNote"></p>
+    </section>
+
+    <section>
+      <h2>Parameters</h2>
+      <div class="ctl">
+        <label for="r0">Contagiousness (R₀) <output id="r0Out"></output></label>
+        <input type="range" id="r0" min="0.5" max="18" step="0.1">
+        <p class="hint">How many people one sick person infects when nobody is immune.</p>
+      </div>
+      <div class="ctl">
+        <label for="cov">Vaccination rate <output id="covOut"></output></label>
+        <input type="range" id="cov" min="0" max="100" step="1">
+        <p class="hint">Share of the population that gets the vaccine.</p>
+      </div>
+      <div class="ctl">
+        <label for="eff">Vaccine efficacy <output id="effOut"></output></label>
+        <input type="range" id="eff" min="0" max="100" step="1">
+        <p class="hint">Share of vaccinated people who end up fully protected.</p>
+      </div>
+      <div class="ctl">
+        <label for="cfr">Case fatality rate <output id="cfrOut"></output></label>
+        <input type="range" id="cfr" min="0" max="1000" step="1">
+        <p class="hint">Share of infected people who die. (Log scale: 0.01% to 50%.)</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="playbar">
+        <button class="btn primary" id="play">Pause</button>
+        <button class="btn" id="restart">Restart</button>
+        <div class="seg" role="group" aria-label="Speed">
+          <button data-speed="1">1×</button><button data-speed="2" aria-pressed="true">2×</button><button data-speed="4">4×</button>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="reveal"> <span>Reveal which vaccinated people are <em>not</em> protected (shown as hollow rings). In real life you can't tell who they are.</span></label>
+    </section>
+  </aside>
+
+  <section class="stage card" aria-label="Simulation">
+    <div class="simhead">
+      <div class="legend">
+        <span><i class="dot" style="background:var(--c-unvac)"></i>Not vaccinated</span>
+        <span><i class="dot" style="background:var(--c-vac)"></i>Vaccinated</span>
+        <span id="ringKey" hidden><i class="dot ring"></i>Vaccinated, not protected</span>
+        <span><i class="dot" style="background:var(--c-inf)"></i>Contagious</span>
+        <span><i class="dot" style="background:var(--c-rec)"></i>Recovered</span>
+        <span><i class="dot" style="background:var(--c-dead)"></i>Died</span>
+      </div>
+      <div class="clock" id="clock">Day 0</div>
+    </div>
+    <div class="canvas-wrap" id="worldWrap">
+      <canvas id="world" aria-label="Animated population of bouncing balls"></canvas>
+      <div class="banner" id="banner" hidden>
+        <h3 id="bannerTitle"></h3>
+        <p id="bannerText"></p>
+        <button class="btn primary" id="again">Run again</button>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Infected so far</div><div class="v" id="tInf">0</div><div class="s" id="tInfS"></div></div>
+      <div class="tile"><div class="k">Deaths</div><div class="v" id="tDead">0</div><div class="s" id="tDeadS"></div></div>
+      <div class="tile"><div class="k">Effective R</div><div class="v" id="tReff">0</div><div class="s" id="tReffS"></div></div>
+      <div class="tile"><div class="k">Risk if <b>unvaccinated</b></div><div class="v" id="tRu">–</div><div class="s" id="tRuS"></div></div>
+      <div class="tile"><div class="k">Risk if <b>vaccinated</b></div><div class="v" id="tRv">–</div><div class="s" id="tRvS"></div></div>
+      <div class="tile"><div class="k">Herd immunity needs</div><div class="v" id="tHit">–</div><div class="s" id="tHitS"></div></div>
+    </div>
+    <div class="curve-wrap">
+      <canvas id="curve" aria-label="Epidemic curve over time"></canvas>
+      <p class="subtle">Population over time. The 3 red balls at the start are visitors who bring the disease in; they aren't counted in the stats.</p>
+    </div>
+  </section>
+</main>
+
+<section class="analysis">
+  <h2>How sensitive is it?</h2>
+  <p class="callout" id="callout"></p>
+  <div class="grid2">
+    <div class="card">
+      <h3>Deaths per million people vs. vaccination rate</h3>
+      <div class="keyrow" id="lineKey"></div>
+      <canvas class="chart" id="lineChart" aria-label="Deaths per million versus vaccination rate"></canvas>
+      <p class="cap" id="lineCap">Hover or tap to read values. Click to set the vaccination rate.</p>
+    </div>
+    <div class="card">
+      <h3>Vaccination rate × efficacy: share of people infected</h3>
+      <div class="keyrow"><span><i style="color:var(--c-safe);border-top-width:10px;width:14px"></i>Herd immunity (outbreak can't take off)</span><span><i style="color:#e5484d;border-top-width:10px;width:14px"></i>More people infected</span></div>
+      <canvas class="chart" id="heat" aria-label="Heat map of infected share by vaccination rate and efficacy"></canvas>
+      <p class="cap" id="heatCap">Hover or tap to read values. Click to try that combination.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><b>About the model.</b> This is a simple SIR (susceptible → infected → recovered) model. Each infected ball stays contagious for a fixed time, and the chance of passing it on per bounce is tuned so one case causes about R₀ new cases in a fully susceptible crowd. The vaccine is "all or nothing": each vaccinated person is either fully protected (with probability = efficacy) or not protected at all. The charts use the standard final-size equation for the same model, which assumes a large, well-mixed population. With only ~450 balls the animation is noisier: small outbreaks sometimes die out by luck, which also happens in real life.</p>
+  <p>Preset numbers are rough, commonly cited estimates chosen to show the ideas. They are not forecasts, and real fatality rates vary a lot with age, health care and other factors. This is a teaching tool, not medical advice.</p>
+</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+// ---------- constants ----------
+const W = 1000, H = 600;          // world units
+const N = 450;                    // balls (incl. visitors)
+const SEEDS = 3;                  // imported cases, excluded from stats
+const POP = N - SEEDS;
+const R = 5.5;                    // ball radius
+const SPEED = 120;                // world units / sim-second
+const CT = 20;                    // target contacts per infectious period (sets the period length)
+const DAYS_PER_INFECTION = 8;     // label: an infectious period is ~8 days
+const CS = 2 * R;
+const GC = Math.ceil(W / CS), GR = Math.ceil(H / CS);
+const CFR_MIN = 1e-4, CFR_MAX = 0.5;
+
+const $ = id => document.getElementById(id);
+
+// ---------- parameters & presets ----------
+const P = { r0: 15, cov: 0.97, eff: 0.97, cfr: 0.002 };
+
+const PRESETS = [
+  { g: 'Diseases', name: 'Measles · 97% vaccinated', r0: 15, cov: .97, eff: .97, cfr: .002,
+    note: 'Two doses of measles vaccine are about 97% effective. At 97% coverage, measles has nowhere to go.' },
+  { g: 'Diseases', name: 'Measles · 90% vaccinated', r0: 15, cov: .90, eff: .97, cfr: .002,
+    note: 'Same vaccine, just 7 points less coverage. Measles is so contagious that this small slip lets outbreaks through.' },
+  { g: 'Diseases', name: 'Measles · no vaccine', r0: 15, cov: 0, eff: .97, cfr: .002,
+    note: 'Before the vaccine, almost everyone caught measles as a child.' },
+  { g: 'Diseases', name: 'Smallpox-like · 80% vaccinated', r0: 5, cov: .80, eff: .95, cfr: .30,
+    note: 'A deadly disease with a good vaccine. 80% coverage falls just short of the ~85% needed, so it still spreads.' },
+  { g: 'Diseases', name: 'COVID-like · no vaccine', r0: 2.8, cov: 0, eff: .9, cfr: .01,
+    note: 'An early-2020-style scenario with no vaccine and no other precautions. A modest R₀ still infects most people.' },
+  { g: 'Diseases', name: 'Seasonal flu', r0: 1.3, cov: .5, eff: .4, cfr: .001,
+    note: 'Flu vaccines are only moderately effective, but flu also spreads slowly, so even partial protection helps.' },
+  { g: 'Lessons', name: 'Tipping point · 75% vaccinated', r0: 4, cov: .75, eff: .90, cfr: .01,
+    note: 'With R₀ = 4 and a 90% effective vaccine, herd immunity needs 83% coverage. At 75%, the outbreak spreads.' },
+  { g: 'Lessons', name: 'Tipping point · 90% vaccinated', r0: 4, cov: .90, eff: .90, cfr: .01,
+    note: 'Same disease, 15 more points of coverage. Now the visitors\' infections usually go nowhere.' },
+  { g: 'Lessons', name: 'Why most cases can be vaccinated', r0: 4, cov: .90, eff: .70, cfr: .005,
+    note: 'When almost everyone is vaccinated, most patients may be vaccinated, yet each unvaccinated person is far more likely to get sick. Compare the two risk tiles.' },
+];
+let activePreset = 0;
+
+// ---------- formatting ----------
+const pct0 = v => Math.round(v * 100) + '%';
+function fmtCfr(c) {
+  const p = c * 100;
+  if (p >= 10) return p.toFixed(0) + '%';
+  if (p >= 1) return (+p.toFixed(1)) + '%';
+  if (p >= 0.1) return (+p.toFixed(2)) + '%';
+  return (+p.toFixed(3)) + '%';
+}
+function fmtInt(v) { return Math.round(v).toLocaleString('en-US'); }
+function fmtApprox(v) { // 2 significant figures for model estimates
+  if (v < 100) return fmtInt(v);
+  const p = Math.pow(10, Math.floor(Math.log10(v)) - 1);
+  return fmtInt(Math.round(v / p) * p);
+}
+function fmtBig(v) {
+  if (v >= 1e6) return (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + 'M';
+  if (v >= 1e4) return Math.round(v / 1e3) + 'k';
+  if (v >= 1e3) return (v / 1e3).toFixed(1) + 'k';
+  return Math.round(v).toString();
+}
+const cfrToSlider = c => Math.round(1000 * Math.log(c / CFR_MIN) / Math.log(CFR_MAX / CFR_MIN));
+const sliderToCfr = t => CFR_MIN * Math.pow(CFR_MAX / CFR_MIN, t / 1000);
+
+// ---------- theory (final-size equation) ----------
+// Fraction of the whole population infected in a large well-mixed population.
+function finalSize(r0, s0) {
+  if (s0 <= 0 || r0 * s0 <= 1) return 0;
+  let z = s0; // start right of the root; Newton converges monotonically (g is convex)
+  for (let k = 0; k < 60; k++) {
+    const e = Math.exp(-r0 * z);
+    const g = z - s0 * (1 - e), dg = 1 - s0 * r0 * e;
+    const nz = z - g / dg;
+    if (!(nz > 0)) return 0;
+    if (Math.abs(nz - z) < 1e-12) { z = nz; break; }
+    z = nz;
+  }
+  return z;
+}
+function theory(r0, cov, eff, cfr) {
+  const s0 = 1 - cov * eff;
+  const z = finalSize(r0, s0);
+  const attack = s0 > 0 ? z / s0 : 0;          // infection prob. for a susceptible person
+  const riskU = attack, riskV = (1 - eff) * attack;
+  const hit = r0 > 1 ? (1 - 1 / r0) / eff : 0; // coverage needed for herd immunity
+  return { s0, reff: r0 * s0, z, riskU, riskV, hit, deathsPerM: z * cfr * 1e6 };
+}
+
+// ---------- simulation state ----------
+const x = new Float32Array(N), y = new Float32Array(N), vx = new Float32Array(N), vy = new Float32Array(N);
+const st = new Uint8Array(N);   // 0 healthy, 1 contagious, 2 recovered, 3 dead
+const vac = new Uint8Array(N), prot = new Uint8Array(N), die = new Uint8Array(N);
+const tInf = new Float32Array(N), dur = new Float32Array(N);
+const head = new Int32Array(GC * GR), nextI = new Int32Array(N);
+const S = { time: 0, D: 1, lam: 1, dayLen: 1, done: false, hist: [], lastSample: -1,
+            nVac: 0, nUnvac: 0, infVac: 0, infUnvac: 0, deaths: 0, peak: 0, contacts: 0 };
+let running = true, speed = 2, reveal = false;
+
+function rand() { return Math.random(); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = (rand() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function analyticLambda(alive) {
+  // collisions per ball per sim-second for a 2D gas: n * (4R) * mean relative speed
+  const n = alive / (W * H);
+  return n * 4 * R * 1.26 * SPEED;
+}
+
+function reset() {
+  // positions (rejection sampling, no overlaps)
+  for (let i = 0; i < N; i++) {
+    let ok = false, tries = 0, px = 0, py = 0;
+    while (!ok && tries++ < 200) {
+      px = R + rand() * (W - 2 * R); py = R + rand() * (H - 2 * R); ok = true;
+      for (let j = 0; j < i; j++) { const dx = x[j] - px, dy = y[j] - py; if (dx * dx + dy * dy < 4.4 * R * R) { ok = false; break; } }
+    }
+    x[i] = px; y[i] = py;
+    const a = rand() * Math.PI * 2;
+    vx[i] = Math.cos(a) * SPEED; vy[i] = Math.sin(a) * SPEED;
+    st[i] = 0; vac[i] = 0; prot[i] = 0; die[i] = 0; tInf[i] = 0; dur[i] = 0;
+  }
+  // indices 0..SEEDS-1 are unvaccinated visitors who arrive contagious
+  const idx = shuffle(Array.from({ length: POP }, (_, k) => k + SEEDS));
+  const nv = Math.round(P.cov * POP), np = Math.round(P.eff * nv);
+  for (let k = 0; k < nv; k++) { vac[idx[k]] = 1; if (k < np) prot[idx[k]] = 1; }
+  S.nVac = nv; S.nUnvac = POP - nv;
+
+  S.lam = analyticLambda(N);
+  S.D = CT / S.lam;
+  S.dayLen = S.D / DAYS_PER_INFECTION;
+  S.time = 0; S.done = false; S.hist = []; S.lastSample = -1;
+  S.infVac = 0; S.infUnvac = 0; S.deaths = 0; S.peak = 0; S.contacts = 0;
+  for (let i = 0; i < SEEDS; i++) infect(i, true);
+  sample();
+  $('banner').hidden = true;
+  updateTiles();
+}
+
+function infect(i, seed) {
+  st[i] = 1; tInf[i] = S.time;
+  dur[i] = S.D * (0.75 + 0.5 * rand());
+  die[i] = (!seed && rand() < P.cfr) ? 1 : 0;
+  if (!seed) { if (vac[i]) S.infVac++; else S.infUnvac++; }
+}
+
+function step(dt) {
+  const t = (S.time += dt);
+  // move + walls
+  for (let i = 0; i < N; i++) {
+    if (st[i] === 3) continue;
+    let px = x[i] + vx[i] * dt, py = y[i] + vy[i] * dt;
+    if (px < R) { px = R; vx[i] = Math.abs(vx[i]); } else if (px > W - R) { px = W - R; vx[i] = -Math.abs(vx[i]); }
+    if (py < R) { py = R; vy[i] = Math.abs(vy[i]); } else if (py > H - R) { py = H - R; vy[i] = -Math.abs(vy[i]); }
+    x[i] = px; y[i] = py;
+  }
+  // spatial grid
+  head.fill(-1);
+  let alive = 0;
+  for (let i = 0; i < N; i++) {
+    if (st[i] === 3) continue;
+    alive++;
+    const cx = Math.min(GC - 1, (x[i] / CS) | 0), cy = Math.min(GR - 1, (y[i] / CS) | 0);
+    const c = cy * GC + cx; nextI[i] = head[c]; head[c] = i;
+  }
+  const pInf = Math.min(1, P.r0 / (S.lam * S.D));
+  const r2 = 4 * R * R;
+  let contacts = 0;
+  for (let i = 0; i < N; i++) {
+    if (st[i] === 3) continue;
+    const cx = Math.min(GC - 1, (x[i] / CS) | 0), cy = Math.min(GR - 1, (y[i] / CS) | 0);
+    for (let oy = -1; oy <= 1; oy++) {
+      const yy = cy + oy; if (yy < 0 || yy >= GR) continue;
+      for (let ox = -1; ox <= 1; ox++) {
+        const xx = cx + ox; if (xx < 0 || xx >= GC) continue;
+        for (let j = head[yy * GC + xx]; j !== -1; j = nextI[j]) {
+          if (j <= i) continue;
+          const dx = x[j] - x[i], dy = y[j] - y[i], d2 = dx * dx + dy * dy;
+          if (d2 >= r2 || d2 === 0) continue;
+          const d = Math.sqrt(d2), nx = dx / d, ny = dy / d;
+          const ov = (2 * R - d) / 2;
+          x[i] -= nx * ov; y[i] -= ny * ov; x[j] += nx * ov; y[j] += ny * ov;
+          const rel = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny;
+          if (rel <= 0) continue; // already separating
+          vx[i] -= rel * nx; vy[i] -= rel * ny; vx[j] += rel * nx; vy[j] += rel * ny;
+          contacts++;
+          const si = st[i], sj = st[j];
+          if (si === 1 && sj === 0 && !prot[j]) { if (rand() < pInf) infect(j, false); }
+          else if (sj === 1 && si === 0 && !prot[i]) { if (rand() < pInf) infect(i, false); }
+        }
+      }
+    }
+  }
+  // empirical contact rate (keeps transmission per bounce calibrated as the crowd changes)
+  if (alive > 0) {
+    const inst = (2 * contacts) / alive / dt;
+    S.lam += (inst - S.lam) * Math.min(1, dt / 4);
+  }
+  // progression
+  let nInf = 0;
+  for (let i = 0; i < N; i++) {
+    if (st[i] !== 1) continue;
+    if (t - tInf[i] >= dur[i]) {
+      if (die[i]) { st[i] = 3; vx[i] = 0; vy[i] = 0; S.deaths++; }
+      else st[i] = 2;
+    } else nInf++;
+  }
+  if (t - S.lastSample >= S.dayLen / 2) sample();
+  if (nInf === 0 && !S.done) { S.done = true; sample(); finish(); }
+}
+
+function counts() {
+  let inf = 0, rec = 0, dead = 0, hu = 0, hv = 0;
+  for (let i = SEEDS; i < N; i++) {
+    const s = st[i];
+    if (s === 1) inf++; else if (s === 2) rec++; else if (s === 3) dead++;
+    else if (vac[i]) hv++; else hu++;
+  }
+  return { inf, rec, dead, hu, hv };
+}
+function sample() {
+  const c = counts();
+  S.hist.push({ t: S.time, ...c });
+  S.lastSample = S.time;
+  if (c.inf > S.peak) S.peak = c.inf;
+}
+
+function finish() {
+  const tot = S.infVac + S.infUnvac;
+  const day = Math.max(1, Math.round(S.time / S.dayLen));
+  const title = tot <= 3 ? 'The outbreak fizzled out' : `Outbreak over after ${day} days`;
+  let text = `${tot} of ${POP} people were infected (${pct0(tot / POP)}), and ${S.deaths} died.`;
+  if (S.nUnvac > 0 && S.nVac > 0 && tot > 0) {
+    text += ` ${pct0(S.infUnvac / S.nUnvac)} of unvaccinated people got sick vs ${pct0(S.infVac / S.nVac)} of vaccinated people.`;
+  }
+  const th = theory(P.r0, P.cov, P.eff, P.cfr);
+  text += ` In a city of 1 million, the model predicts about ${fmtApprox(th.deathsPerM)} deaths.`;
+  $('bannerTitle').textContent = title;
+  $('bannerText').textContent = text;
+  $('banner').hidden = false;
+}
+
+// ---------- tiles ----------
+function updateTiles() {
+  const tot = S.infVac + S.infUnvac;
+  $('tInf').textContent = fmtInt(tot);
+  $('tInfS').textContent = pct0(tot / POP) + ' of ' + POP + ' people';
+  $('tDead').textContent = fmtInt(S.deaths);
+  $('tDeadS').textContent = 'CFR ' + fmtCfr(P.cfr);
+  const th = theory(P.r0, P.cov, P.eff, P.cfr);
+  const tr = $('tReff');
+  tr.textContent = th.reff.toFixed(2);
+  tr.className = 'v ' + (th.reff > 1 ? 'bad' : 'good');
+  $('tReffS').textContent = th.reff > 1 ? 'Above 1: can spread' : 'Below 1: dies out';
+  $('tRu').textContent = S.nUnvac ? pct0(S.infUnvac / S.nUnvac) : '–';
+  $('tRuS').textContent = S.nUnvac ? `${S.infUnvac} of ${S.nUnvac} · theory ${pct0(th.riskU)}` : 'Nobody unvaccinated';
+  $('tRv').textContent = S.nVac ? pct0(S.infVac / S.nVac) : '–';
+  $('tRvS').textContent = S.nVac ? `${S.infVac} of ${S.nVac} · theory ${pct0(th.riskV)}` : 'Nobody vaccinated';
+  const hit = $('tHit');
+  if (P.r0 <= 1) { hit.textContent = '0%'; hit.className = 'v good'; $('tHitS').textContent = 'R₀ ≤ 1: no outbreak'; }
+  else if (th.hit > 1) { hit.textContent = 'Unreachable'; hit.className = 'v bad'; hit.style.fontSize = '18px'; $('tHitS').textContent = `even 100% at ${pct0(P.eff)} efficacy`; }
+  else { hit.textContent = '≥ ' + Math.ceil(th.hit * 100) + '%'; hit.className = 'v ' + (P.cov >= th.hit ? 'good' : 'bad'); $('tHitS').textContent = `vaccinated (now ${pct0(P.cov)})`; }
+  if (th.hit <= 1 || P.r0 <= 1) hit.style.fontSize = '';
+  const day = Math.floor(S.time / S.dayLen);
+  const pInf = Math.min(1, P.r0 / (S.lam * S.D));
+  $('clock').textContent = `Day ${day} · ${(pInf * 100).toFixed(0)}% chance per bounce`;
+}
+
+// ---------- drawing helpers ----------
+let C = {};
+function readColors() {
+  const cs = getComputedStyle(document.documentElement);
+  for (const k of ['bg', 'card', 'ink', 'muted', 'line', 'soft', 'accent', 'c-unvac', 'c-vac', 'c-inf', 'c-rec', 'c-dead', 'c-safe', 'world'])
+    C[k] = cs.getPropertyValue('--' + k).trim();
+}
+function sizeCanvas(cv, cssW, cssH) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = Math.max(1, Math.round(cssW * dpr)), h = Math.max(1, Math.round(cssH * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// world
+const world = $('world');
+let worldCtx, worldScale = 1;
+function layoutWorld() {
+  const w = world.parentElement.clientWidth;
+  world.style.height = (w * H / W) + 'px';
+  worldCtx = sizeCanvas(world, w, w * H / W);
+  worldScale = w / W;
+}
+function drawWorld() {
+  const ctx = worldCtx; if (!ctx) return;
+  const s = worldScale;
+  ctx.clearRect(0, 0, W * s, H * s);
+  const r = Math.max(1.6, R * s);
+  // halos for contagious
+  ctx.fillStyle = C['c-inf']; ctx.globalAlpha = 0.16; ctx.beginPath();
+  for (let i = 0; i < N; i++) if (st[i] === 1) { ctx.moveTo(x[i] * s + r * 2.4, y[i] * s); ctx.arc(x[i] * s, y[i] * s, r * 2.4, 0, 6.2832); }
+  ctx.fill(); ctx.globalAlpha = 1;
+  const group = (pred, color) => {
+    ctx.fillStyle = color; ctx.beginPath();
+    for (let i = 0; i < N; i++) if (pred(i)) { ctx.moveTo(x[i] * s + r, y[i] * s); ctx.arc(x[i] * s, y[i] * s, r, 0, 6.2832); }
+    ctx.fill();
+  };
+  group(i => st[i] === 0 && !vac[i], C['c-unvac']);
+  group(i => st[i] === 0 && vac[i] && (prot[i] || !reveal), C['c-vac']);
+  group(i => st[i] === 2, C['c-rec']);
+  group(i => st[i] === 1, C['c-inf']);
+  if (reveal) {
+    ctx.strokeStyle = C['c-vac']; ctx.lineWidth = Math.max(1.2, r * 0.42); ctx.beginPath();
+    const rr = r - ctx.lineWidth / 2;
+    for (let i = 0; i < N; i++) if (st[i] === 0 && vac[i] && !prot[i]) { ctx.moveTo(x[i] * s + rr, y[i] * s); ctx.arc(x[i] * s, y[i] * s, rr, 0, 6.2832); }
+    ctx.stroke();
+  }
+  // dead: small cross
+  ctx.strokeStyle = C['c-dead']; ctx.lineWidth = Math.max(1.2, r * 0.35); ctx.lineCap = 'round'; ctx.beginPath();
+  const k = r * 0.8;
+  for (let i = 0; i < N; i++) if (st[i] === 3) {
+    const px = x[i] * s, py = y[i] * s;
+    ctx.moveTo(px - k, py - k); ctx.lineTo(px + k, py + k); ctx.moveTo(px + k, py - k); ctx.lineTo(px - k, py + k);
+  }
+  ctx.stroke();
+}
+
+// epidemic curve (stacked area)
+const curve = $('curve');
+function drawCurve() {
+  const w = curve.clientWidth, h = curve.clientHeight;
+  const ctx = sizeCanvas(curve, w, h);
+  ctx.clearRect(0, 0, w, h);
+  const hist = S.hist; if (!hist.length) return;
+  const padL = 34, padB = 18, pw = w - padL - 4, ph = h - padB - 4;
+  const tMax = Math.max(S.dayLen * 40, hist[hist.length - 1].t);
+  const X = t => padL + (t / tMax) * pw;
+  const Y = v => 4 + ph - (v / POP) * ph;
+  const layers = [['inf', C['c-inf']], ['dead', C['c-dead']], ['rec', C['c-rec']], ['hu', C['c-unvac']], ['hv', C['c-vac']]];
+  const base = new Float32Array(hist.length);
+  for (const [key, col] of layers) {
+    ctx.beginPath();
+    for (let k = 0; k < hist.length; k++) { const v = base[k] + hist[k][key]; k ? ctx.lineTo(X(hist[k].t), Y(v)) : ctx.moveTo(X(hist[k].t), Y(v)); }
+    for (let k = hist.length - 1; k >= 0; k--) ctx.lineTo(X(hist[k].t), Y(base[k]));
+    ctx.closePath(); ctx.fillStyle = col; ctx.globalAlpha = key === 'hu' || key === 'hv' ? 0.45 : 0.9; ctx.fill();
+    for (let k = 0; k < hist.length; k++) base[k] += hist[k][key];
+  }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = C.muted; ctx.font = '11px system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const f of [0, .5, 1]) { ctx.fillText(Math.round(f * 100) + '%', padL - 5, Y(f * POP)); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const days = tMax / S.dayLen, stepD = days > 120 ? 40 : days > 60 ? 20 : 10;
+  for (let d = 0; d <= days; d += stepD) ctx.fillText(d === 0 ? 'day 0' : String(d), X(d * S.dayLen), h - padB + 4);
+}
+
+// ---------- analysis charts ----------
+const lineCv = $('lineChart'), heatCv = $('heat');
+let lineHover = null, heatHover = null;
+
+function effSet() {
+  const base = Math.round(P.eff * 100);
+  const set = [{ e: base, main: true }];
+  for (const d of [-10, -20]) { const e = base + d; if (e >= 5) set.push({ e, main: false }); }
+  if (base <= 90) set.push({ e: Math.min(100, base + 10), main: false, up: true });
+  return set;
+}
+
+function drawLine() {
+  const w = lineCv.clientWidth, h = lineCv.clientHeight;
+  const ctx = sizeCanvas(lineCv, w, h);
+  ctx.clearRect(0, 0, w, h);
+  const padL = 48, padR = 10, padT = 10, padB = 30;
+  const pw = w - padL - padR, ph = h - padT - padB;
+  const set = effSet();
+  const yMax0 = theory(P.r0, 0, 1, P.cfr).deathsPerM;
+  const yMax = niceMax(yMax0 || 1);
+  const X = c => padL + c * pw, Y = v => padT + ph - (v / yMax) * ph;
+  // grid
+  ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.fillStyle = C.muted; ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let k = 0; k <= 4; k++) { const v = yMax * k / 4, yy = Math.round(Y(v)) + .5; ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(w - padR, yy); ctx.stroke(); ctx.fillText(fmtBig(v), padL - 6, yy); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let c = 0; c <= 100; c += 20) ctx.fillText(c + '%', X(c / 100), h - padB + 6);
+  ctx.fillText('vaccination rate', padL + pw / 2, h - 13);
+  // herd-immunity threshold for current efficacy
+  const th = theory(P.r0, P.cov, P.eff, P.cfr);
+  if (P.r0 > 1 && th.hit <= 1) {
+    const xx = X(th.hit);
+    ctx.fillStyle = C['c-safe']; ctx.globalAlpha = .55; ctx.fillRect(xx, padT, X(1) - xx, ph); ctx.globalAlpha = 1;
+    ctx.fillStyle = C.muted; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    if (X(1) - xx > 70) ctx.fillText('herd immunity', xx + 5, padT + 4);
+  }
+  // curves
+  const key = [];
+  set.slice().reverse().forEach(o => {
+    ctx.beginPath();
+    for (let k = 0; k <= 200; k++) { const c = k / 200, v = theory(P.r0, c, o.e / 100, P.cfr).deathsPerM; k ? ctx.lineTo(X(c), Y(v)) : ctx.moveTo(X(c), Y(v)); }
+    ctx.setLineDash(o.main ? [] : [5, 4]);
+    ctx.strokeStyle = o.main ? C.accent : (o.up ? C['c-rec'] : C.muted);
+    ctx.globalAlpha = o.main ? 1 : (o.e === Math.round(P.eff * 100) - 20 ? .55 : .85);
+    ctx.lineWidth = o.main ? 2.5 : 1.6; ctx.stroke();
+  });
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+  // current point
+  const cy = th.deathsPerM;
+  ctx.strokeStyle = C.ink; ctx.globalAlpha = .35; ctx.beginPath(); ctx.moveTo(Math.round(X(P.cov)) + .5, padT); ctx.lineTo(Math.round(X(P.cov)) + .5, padT + ph); ctx.stroke(); ctx.globalAlpha = 1;
+  ctx.fillStyle = C.accent; ctx.strokeStyle = C.card; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(X(P.cov), Y(cy), 5.5, 0, 6.2832); ctx.fill(); ctx.stroke();
+  // hover
+  if (lineHover != null) {
+    const c = lineHover;
+    ctx.strokeStyle = C.muted; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(c), padT); ctx.lineTo(X(c), padT + ph); ctx.stroke(); ctx.setLineDash([]);
+    for (const o of set) { const v = theory(P.r0, c, o.e / 100, P.cfr).deathsPerM; ctx.fillStyle = o.main ? C.accent : (o.up ? C['c-rec'] : C.muted); ctx.beginPath(); ctx.arc(X(c), Y(v), 3.5, 0, 6.2832); ctx.fill(); }
+    const parts = set.map(o => `${o.e}% efficacy: ${fmtInt(theory(P.r0, c, o.e / 100, P.cfr).deathsPerM)}`);
+    $('lineCap').textContent = `At ${Math.round(c * 100)}% vaccinated → deaths per million · ` + parts.join(' · ');
+  } else {
+    $('lineCap').textContent = 'Hover or tap to read values. Click to set the vaccination rate.';
+  }
+  // key
+  $('lineKey').innerHTML = set.map(o => `<span style="color:${o.main ? C.accent : (o.up ? C['c-rec'] : C.muted)}"><i class="${o.main ? '' : 'd'}"></i><span style="color:${C.muted}">${o.e}% efficacy${o.main ? ' (current)' : ''}</span></span>`).join('');
+}
+function niceMax(v) {
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+  return 10 * p;
+}
+
+// heat map
+let heatImg = null, heatKey = '';
+function heatColor(f) { // f = fraction infected 0..1
+  // ramp: amber -> red -> deep maroon
+  const stops = [[0, [253, 224, 160]], [0.25, [248, 160, 90]], [0.55, [229, 72, 77]], [1, [110, 18, 40]]];
+  for (let k = 1; k < stops.length; k++) {
+    if (f <= stops[k][0]) {
+      const [a, ca] = stops[k - 1], [b, cb] = stops[k], u = (f - a) / (b - a);
+      return ca.map((c, i) => Math.round(c + (cb[i] - c) * u));
+    }
+  }
+  return stops[stops.length - 1][1];
+}
+function hexToRgb(h) {
+  if (h.startsWith('#')) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+  return [200, 220, 245];
+}
+function drawHeat() {
+  const w = heatCv.clientWidth, h = heatCv.clientHeight;
+  const ctx = sizeCanvas(heatCv, w, h);
+  ctx.clearRect(0, 0, w, h);
+  const padL = 44, padR = 10, padT = 10, padB = 30;
+  const pw = w - padL - padR, ph = h - padT - padB;
+  const G = 100;
+  const k = P.r0 + '|' + C['c-safe'];
+  if (k !== heatKey) {
+    heatKey = k;
+    const off = document.createElement('canvas'); off.width = G; off.height = G;
+    const octx = off.getContext('2d'), img = octx.createImageData(G, G);
+    const safe = hexToRgb(C['c-safe']);
+    for (let iy = 0; iy < G; iy++) {
+      const e = 1 - (iy + .5) / G;
+      for (let ix = 0; ix < G; ix++) {
+        const c = (ix + .5) / G;
+        const z = finalSize(P.r0, 1 - c * e);
+        const col = z <= 0 ? safe : heatColor(Math.min(1, z));
+        const o = (iy * G + ix) * 4; img.data[o] = col[0]; img.data[o + 1] = col[1]; img.data[o + 2] = col[2]; img.data[o + 3] = 255;
+      }
+    }
+    octx.putImageData(img, 0, 0); heatImg = off;
+  }
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(heatImg, padL, padT, pw, ph);
+  const X = c => padL + c * pw, Y = e => padT + (1 - e) * ph;
+  // threshold curve: c = (1 - 1/R0)/e
+  if (P.r0 > 1) {
+    const q = 1 - 1 / P.r0;
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.beginPath();
+    let started = false;
+    for (let k = 0; k <= 200; k++) { const e = q + (1 - q) * k / 200; const c = q / e; if (c > 1) continue; started ? ctx.lineTo(X(c), Y(e)) : ctx.moveTo(X(c), Y(e)); started = true; }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  // axes
+  ctx.fillStyle = C.muted; ctx.font = '11px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let c = 0; c <= 100; c += 20) ctx.fillText(c + '%', X(c / 100), h - padB + 6);
+  ctx.fillText('vaccination rate', padL + pw / 2, h - 13);
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let e = 0; e <= 100; e += 20) ctx.fillText(e + '%', padL - 6, Y(e / 100));
+  ctx.save(); ctx.translate(11, padT + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('efficacy', 0, 0); ctx.restore();
+  // current point
+  ctx.strokeStyle = C.card; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(X(P.cov), Y(P.eff), 7, 0, 6.2832); ctx.stroke();
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X(P.cov), Y(P.eff), 7, 0, 6.2832); ctx.stroke();
+  if (heatHover) {
+    const [c, e] = heatHover;
+    ctx.strokeStyle = C.ink; ctx.globalAlpha = .6; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X(c), Y(e), 4, 0, 6.2832); ctx.stroke(); ctx.globalAlpha = 1;
+    const th = theory(P.r0, c, e, P.cfr);
+    $('heatCap').textContent = `${Math.round(c * 100)}% vaccinated, ${Math.round(e * 100)}% efficacy → ` +
+      (th.z <= 0 ? 'herd immunity: no large outbreak' : `${pct0(th.z)} infected, ~${fmtApprox(th.deathsPerM)} deaths per million`);
+  } else {
+    $('heatCap').textContent = 'Dashed line = herd-immunity threshold. Hover or tap to read values. Click to try that combination.';
+  }
+}
+
+function chartPos(cv, ev, padL, padR, padT, padB) {
+  const r = cv.getBoundingClientRect();
+  const px = ev.clientX - r.left, py = ev.clientY - r.top;
+  const pw = r.width - padL - padR, ph = r.height - padT - padB;
+  return [Math.max(0, Math.min(1, (px - padL) / pw)), Math.max(0, Math.min(1, 1 - (py - padT) / ph))];
+}
+
+// ---------- callout ----------
+function updateCallout() {
+  const th = theory(P.r0, P.cov, P.eff, P.cfr);
+  const parts = [];
+  const r0s = P.r0.toFixed(1).replace(/\.0$/, '');
+  if (P.r0 <= 1) {
+    parts.push(`With R₀ = ${r0s}, each case causes less than one new case on average, so the disease dies out even without a vaccine.`);
+  } else {
+    if (th.hit > 1) parts.push(`With R₀ = ${r0s} and a ${pct0(P.eff)} effective vaccine, <b>even vaccinating everyone can't reach herd immunity</b>. You'd need a vaccine at least ${Math.ceil((1 - 1 / P.r0) * 100)}% effective.`);
+    else parts.push(`With R₀ = ${r0s} and a ${pct0(P.eff)} effective vaccine, herd immunity needs <b>at least ${Math.ceil(th.hit * 100)}% vaccinated</b>. You're at ${pct0(P.cov)}.`);
+    parts.push(`In a city of 1 million, the model predicts <b>~${fmtApprox(th.z * 1e6)} infections and ~${fmtApprox(th.deathsPerM)} deaths</b>.`);
+    const alt = [];
+    const c5 = Math.max(0, P.cov - .05), e10 = Math.max(0, P.eff - .10);
+    const tc = theory(P.r0, c5, P.eff, P.cfr), te = theory(P.r0, P.cov, e10, P.cfr), t0 = theory(P.r0, 0, P.eff, P.cfr);
+    const delta = (a, b) => {
+      if (b <= 0.5 && a <= 0.5) return 'still about none';
+      if (a <= 0.5) return `<b>${fmtInt(b)}</b>, up from almost none`;
+      const ratio = b / a;
+      return `<b>${fmtInt(b)}</b>` + (ratio >= 1.1 ? ` (${ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)}× as many)` : '');
+    };
+    if (P.cov > 0) alt.push(`5 points less coverage (${pct0(c5)}) → ${delta(th.deathsPerM, tc.deathsPerM)}`);
+    if (P.cov > 0 && P.eff > 0) alt.push(`a vaccine 10 points less effective (${pct0(e10)}) → ${delta(th.deathsPerM, te.deathsPerM)}`);
+    if (P.cov > 0) alt.push(`no vaccination at all → <b>${fmtInt(t0.deathsPerM)}</b>`);
+    if (alt.length) parts.push('Deaths per million with ' + alt.join('; ') + '.');
+  }
+  $('callout').innerHTML = parts.join(' ');
+}
+
+// ---------- controls ----------
+const els = { r0: $('r0'), cov: $('cov'), eff: $('eff'), cfr: $('cfr') };
+function syncSliders() {
+  els.r0.value = P.r0; els.cov.value = Math.round(P.cov * 100); els.eff.value = Math.round(P.eff * 100); els.cfr.value = cfrToSlider(P.cfr);
+  syncOutputs();
+}
+function syncOutputs() {
+  $('r0Out').textContent = P.r0.toFixed(1);
+  $('covOut').textContent = pct0(P.cov);
+  $('effOut').textContent = pct0(P.eff);
+  $('cfrOut').textContent = fmtCfr(P.cfr);
+}
+function readSlider(k) {
+  if (k === 'r0') P.r0 = +els.r0.value;
+  else if (k === 'cov') P.cov = els.cov.value / 100;
+  else if (k === 'eff') P.eff = els.eff.value / 100;
+  else if (k === 'cfr') P.cfr = sliderToCfr(+els.cfr.value);
+}
+function refreshAnalysis() { syncOutputs(); updateCallout(); drawLine(); drawHeat(); updateTiles(); }
+
+function setPresetUI() {
+  document.querySelectorAll('.pbtn').forEach((b, i) => b.setAttribute('aria-pressed', String(i === activePreset)));
+  $('presetNote').textContent = activePreset >= 0 ? PRESETS[activePreset].note : 'Custom settings.';
+}
+function applyPreset(i) {
+  activePreset = i;
+  const p = PRESETS[i];
+  Object.assign(P, { r0: p.r0, cov: p.cov, eff: p.eff, cfr: p.cfr });
+  syncSliders(); setPresetUI(); reset(); refreshAnalysis(); setRunning(true);
+}
+function buildPresets() {
+  const host = $('presets');
+  const groups = [...new Set(PRESETS.map(p => p.g))];
+  for (const g of groups) {
+    const box = document.createElement('div');
+    box.innerHTML = `<div class="pgroup-label">${g}</div>`;
+    const row = document.createElement('div'); row.className = 'pbtns';
+    PRESETS.forEach((p, i) => {
+      if (p.g !== g) return;
+      const b = document.createElement('button'); b.className = 'pbtn'; b.textContent = p.name;
+      b.addEventListener('click', () => applyPreset(i));
+      row.appendChild(b);
+    });
+    box.appendChild(row); host.appendChild(box);
+  }
+}
+
+for (const k of Object.keys(els)) {
+  els[k].addEventListener('input', () => { readSlider(k); activePreset = -1; setPresetUI(); refreshAnalysis(); });
+  // vaccination settings need a fresh population; R0 and CFR apply live
+  els[k].addEventListener('change', () => { if (k === 'cov' || k === 'eff') { reset(); setRunning(true); } refreshAnalysis(); });
+}
+
+function setRunning(v) { running = v; $('play').textContent = v ? 'Pause' : 'Play'; }
+$('play').addEventListener('click', () => { if (S.done) { reset(); setRunning(true); } else setRunning(!running); });
+$('restart').addEventListener('click', () => { reset(); setRunning(true); });
+$('again').addEventListener('click', () => { reset(); setRunning(true); });
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  speed = +b.dataset.speed;
+  document.querySelectorAll('.seg button').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+}));
+$('reveal').addEventListener('change', e => { reveal = e.target.checked; $('ringKey').hidden = !reveal; drawWorld(); });
+
+// chart interactions
+const LP = [48, 10, 10, 30], HP = [44, 10, 10, 30];
+lineCv.addEventListener('pointermove', e => { lineHover = chartPos(lineCv, e, ...LP)[0]; drawLine(); });
+lineCv.addEventListener('pointerleave', () => { lineHover = null; drawLine(); });
+lineCv.addEventListener('click', e => {
+  P.cov = Math.round(chartPos(lineCv, e, ...LP)[0] * 100) / 100;
+  activePreset = -1; setPresetUI(); syncSliders(); reset(); setRunning(true); refreshAnalysis();
+});
+heatCv.addEventListener('pointermove', e => { heatHover = chartPos(heatCv, e, ...HP); drawHeat(); });
+heatCv.addEventListener('pointerleave', () => { heatHover = null; drawHeat(); });
+heatCv.addEventListener('click', e => {
+  const [c, ef] = chartPos(heatCv, e, ...HP);
+  P.cov = Math.round(c * 100) / 100; P.eff = Math.round(ef * 100) / 100;
+  activePreset = -1; setPresetUI(); syncSliders(); reset(); setRunning(true); refreshAnalysis();
+});
+
+// ---------- loop ----------
+let last = performance.now(), tileTimer = 0;
+function frame(now) {
+  const real = Math.min(0.05, (now - last) / 1000); last = now;
+  if (running && !S.done) {
+    const simDt = real * speed;
+    const n = Math.max(1, Math.ceil(simDt / (1 / 120)));
+    for (let k = 0; k < n && !S.done; k++) step(simDt / n);
+    tileTimer += real;
+    if (tileTimer > 0.15 || S.done) { tileTimer = 0; updateTiles(); drawCurve(); }
+  }
+  drawWorld();
+  requestAnimationFrame(frame);
+}
+
+function relayout() { layoutWorld(); drawWorld(); drawCurve(); drawLine(); drawHeat(); }
+new ResizeObserver(relayout).observe($('worldWrap'));
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readColors(); heatKey = ''; relayout(); });
+
+// ---------- boot ----------
+readColors();
+buildPresets();
+applyPreset(1);
+relayout();
+requestAnimationFrame(frame);
+
+// for debugging / testing
+window.__sim = { P, S, reset, step, theory, counts, POP };
+})();
+</script>
+</body>
+</html>
