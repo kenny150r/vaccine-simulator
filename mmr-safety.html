@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MMR Safety Evidence</title>
+<meta name="description" content="A visual guide to the MMR vaccine safety research: sample sizes, study designs, how each study controlled for bias, who funded it, and what happened to the studies anti-vaccine groups cite.">
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #14171c; --muted: #5b6470; --line: #e2e5ea; --soft: #eef1f5;
+  --accent: #2563eb;
+  --safe: #2f6fd6; --safe-soft: #dbe7fb;
+  --claim: #d9433f; --claim-soft: #fbe0de;
+  --good: #23885a; --warn: #b26a00; --warn-soft: #fbecd2;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
+    --accent: #6ea0ff;
+    --safe: #6ea0ff; --safe-soft: #1b2b45;
+    --claim: #ff6b67; --claim-soft: #3d1d1f;
+    --good: #43c486; --warn: #f0a640; --warn-soft: #3a2a12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
+  --accent: #6ea0ff;
+  --safe: #6ea0ff; --safe-soft: #1b2b45;
+  --claim: #ff6b67; --claim-soft: #3d1d1f;
+  --good: #43c486; --warn: #f0a640; --warn-soft: #3a2a12;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+nav.top { display: flex; gap: 6px; padding: 14px 0 0; flex-wrap: wrap; }
+nav.top a { font-size: 13px; text-decoration: none; padding: 5px 11px; border-radius: 999px; color: var(--muted); border: 1px solid var(--line); background: var(--card); }
+nav.top a[aria-current="page"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+header { padding: 22px 0 8px; }
+h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.12; margin: 0 0 10px; letter-spacing: -0.02em; max-width: 22ch; }
+.lede { margin: 0; color: var(--muted); max-width: 70ch; font-size: 16px; }
+h2 { font-size: clamp(20px, 2.6vw, 26px); margin: 0 0 6px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; margin: 0 0 6px; }
+section.block { padding: 28px 0 6px; }
+.intro { color: var(--muted); max-width: 75ch; margin: 0 0 14px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat .v { font-size: clamp(22px, 3vw, 30px); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.stat .k { font-size: 13px; color: var(--muted); }
+.v.safe { color: var(--safe); } .v.claim { color: var(--claim); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+svg text { font-family: inherit; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.cap { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.readout { font-size: 13px; color: var(--ink); background: var(--soft); border-radius: 10px; padding: 8px 12px; margin-top: 10px; min-height: 2.6em; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip { font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 999px; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+
+/* study matrix */
+.matrix { display: grid; gap: 10px; }
+.srow { display: grid; grid-template-columns: 210px repeat(5, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); }
+.srow > div { padding: 10px 12px; font-size: 13px; border-left: 1px solid var(--line); }
+.srow > div:first-child { border-left: 0; }
+.srow.head { background: transparent; border: 0; }
+.srow.head > div { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; border: 0; padding-bottom: 0; }
+.sname { font-weight: 700; font-size: 14px !important; }
+.sname small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.srow.safety .sname { box-shadow: inset 4px 0 0 var(--safe); }
+.srow.cited .sname { box-shadow: inset 4px 0 0 var(--claim); }
+.srow > .sres { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); background: var(--soft); font-size: 13.5px; }
+.sres .pill { margin: 0 0 0 6px; }
+.lbl { display: none; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin-bottom: 2px; }
+.pill { display: inline-block; font-size: 11.5px; font-weight: 650; padding: 1px 8px; border-radius: 999px; margin: 0 4px 4px 0; }
+.pill.ok { background: var(--safe-soft); color: var(--safe); }
+.pill.bad { background: var(--claim-soft); color: var(--claim); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+@media (max-width: 860px) {
+  .srow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .srow.head { display: none; }
+  .srow > div { border-left: 0; border-top: 1px solid var(--line); }
+  .srow > div:first-child { grid-column: 1 / -1; border-top: 0; }
+  .lbl { display: block; }
+}
+@media (max-width: 480px) { .srow { grid-template-columns: minmax(0, 1fr); } }
+
+/* deep dives */
+.dives { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 860px) { .dives { grid-template-columns: minmax(0, 1fr); } }
+.dive { border-top: 4px solid var(--claim); }
+.dive .meta { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.dive dl { margin: 0; }
+.dive dt { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin-top: 10px; }
+.dive dd { margin: 2px 0 0; font-size: 14px; }
+.dive ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px; }
+.dive li + li { margin-top: 3px; }
+.verdict { margin-top: 12px; padding: 8px 12px; border-radius: 10px; background: var(--claim-soft); font-size: 14px; }
+
+/* funding */
+.fund { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .fund { grid-template-columns: minmax(0, 1fr); } }
+.fund h3 { font-size: 14px; }
+.fund .desc { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.fchip { display: block; font-size: 13px; padding: 6px 10px; border-radius: 8px; margin-bottom: 6px; }
+.fchip.safety { background: var(--safe-soft); }
+.fchip.cited { background: var(--claim-soft); }
+.fchip b { font-weight: 650; }
+.fchip span { display: block; color: var(--muted); font-size: 12px; }
+
+/* timeline */
+.tl { position: relative; padding-left: 26px; }
+.tl::before { content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+.ev { position: relative; padding: 0 0 16px; }
+.ev::before { content: ""; position: absolute; left: -23px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--card); border: 3px solid var(--muted); }
+.ev.safety::before { border-color: var(--safe); }
+.ev.cited::before { border-color: var(--claim); }
+.ev.impact::before { border-color: var(--warn); }
+.ev .yr { font-weight: 750; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.ev p { margin: 2px 0 0; color: var(--muted); font-size: 14px; max-width: 75ch; }
+
+/* bias guide */
+.guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .guide { grid-template-columns: minmax(0, 1fr); } }
+.guide .card p { margin: 0; font-size: 14px; color: var(--muted); }
+.guide .card p + p { margin-top: 8px; color: var(--ink); }
+
+.sources { font-size: 13px; color: var(--muted); padding-left: 20px; }
+.sources li { margin-bottom: 4px; overflow-wrap: anywhere; }
+footer { color: var(--muted); font-size: 13px; padding: 20px 0 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top" aria-label="Site">
+  <a href="./">Herd immunity simulator</a>
+  <a href="mmr-safety.html" aria-current="page">MMR safety evidence</a>
+</nav>
+
+<header>
+  <h1>Does the MMR vaccine cause autism? What the studies actually show</h1>
+  <p class="lede">A visual guide to the research: how big each study was, how it guarded against bias, who paid for it, and what happened to the studies most often cited by anti-vaccine groups.</p>
+  <div class="stats" id="stats"></div>
+</header>
+
+<section class="block" id="size">
+  <h2>1. The size of the evidence</h2>
+  <p class="intro">Number of children in each study, on a log scale (each gridline is 10× the one before). The single paper that started the scare studied 12 children. Studies that found no link followed hundreds of thousands.</p>
+  <div class="card chart">
+    <div class="legend">
+      <span><i class="sw" style="background:var(--safe)"></i>Found no link</span>
+      <span><i class="sw" style="background:var(--claim)"></i>Claimed a link</span>
+      <span><i class="sw" style="background:repeating-linear-gradient(45deg,var(--claim) 0 3px,transparent 3px 6px);border:1px solid var(--claim)"></i>Retracted</span>
+    </div>
+    <div id="sizeChart"></div>
+    <div class="readout" id="sizeReadout">Hover or tap a bar for details.</div>
+  </div>
+</section>
+
+<section class="block" id="results">
+  <h2>2. What the main studies found</h2>
+  <p class="intro">Each line compares autism risk in children who got MMR with children who didn't. The square is the best estimate; the line is the 95% confidence interval (the range the true value very likely falls in). A value of 1 means no difference. Every interval includes 1, so none of these studies found a meaningful increase in risk, including in high-risk children.</p>
+  <div class="card chart">
+    <div id="forest"></div>
+    <p class="cap" id="forestCap"></p>
+  </div>
+</section>
+
+<section class="block" id="methods">
+  <h2>3. How each study was built</h2>
+  <p class="intro">Sample size alone doesn't make a study good. What matters is whether it had a fair comparison group, measured autism objectively, and accounted for other differences between children. Use the buttons to compare.</p>
+  <div class="chips" role="group" aria-label="Filter studies">
+    <button class="chip" data-f="all" aria-pressed="true">All studies</button>
+    <button class="chip" data-f="safety">Safety studies</button>
+    <button class="chip" data-f="cited">Cited by anti-vaccine groups</button>
+  </div>
+  <div class="matrix" id="matrix"></div>
+</section>
+
+<section class="block" id="cited">
+  <h2>4. The studies anti-vaccine groups cite, examined</h2>
+  <p class="intro">These are the papers and claims that come up most often. For each: what it claimed, what was wrong with how it was done, and what happened next.</p>
+  <div class="dives" id="dives"></div>
+</section>
+
+<section class="block" id="funding">
+  <h2>5. Who paid for the research?</h2>
+  <p class="intro" id="fundIntro"></p>
+  <div class="fund" id="fund"></div>
+</section>
+
+<section class="block" id="timeline">
+  <h2>6. Timeline</h2>
+  <div class="card"><div class="tl" id="tl"></div></div>
+</section>
+
+<section class="block" id="risks">
+  <h2>7. What MMR can actually cause, next to what measles causes</h2>
+  <p class="intro">The vaccine does have real, well-documented side effects. They are far rarer and milder than the harms of the disease. Log scale: each gridline is 10× the one before.</p>
+  <div class="card chart">
+    <div class="legend">
+      <span><i class="sw" style="background:var(--safe)"></i>MMR vaccine, per million doses</span>
+      <span><i class="sw" style="background:var(--claim)"></i>Measles infection, per million cases</span>
+    </div>
+    <div id="riskChart"></div>
+    <p class="cap">Bars show a range where sources give one. Vaccine rates are per million doses (CDC); measles rates are per million cases (CDC; SSPE in young children from a California study: 1 in 609 when infected under age 1, 1 in 1,367 under age 5). A Cochrane review puts febrile seizures from MMR-family vaccines somewhat higher, at 1 in 1,150–1,700 doses. The two sets use different denominators, but without vaccination most children eventually catch measles. MMR never contained thimerosal, the mercury-based preservative some vaccine fears focus on (CDC).</p>
+  </div>
+</section>
+
+<section class="block" id="guide">
+  <h2>8. How to judge a vaccine study yourself</h2>
+  <div class="guide" id="guideCards"></div>
+</section>
+
+<section class="block" id="sources">
+  <h2>Sources</h2>
+  <ol class="sources" id="srcList"></ol>
+</section>
+
+<footer>
+  <p>Numbers were checked against the original papers, retraction notices and official reports listed above. This page is educational and not medical advice; talk to a doctor about your own situation.</p>
+</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const fmt = n => n.toLocaleString('en-US');
+
+/* ================= DATA ================= */
+// camp: 'safety' = studies of whether MMR is linked to autism that found no link
+//       'cited'  = studies/claims commonly cited by anti-vaccine groups
+const STUDIES = [{"id": "taylor99", "short": "Taylor 1999", "name": "Taylor et al. 1999", "where": "The Lancet · North London, UK", "camp": "safety", "n": 498, "nShort": "498 cases", "design": "Time-trend analysis plus self-controlled case series", "nText": "498 children with autism", "control": "Self-controlled: compares each child's timing of onset after MMR with other periods; also compares rates before and after MMR began in 1988", "outcome": "Cases from special-needs registers and schools; diagnosis confirmed from clinical records", "controls": "Self-controlled design removes fixed differences between children; tested clustering of onset or regression after vaccination", "funding": "Not confirmed from full text", "finding": "No link: no jump in autism after MMR was introduced; onset within 1 year of MMR RI 0.94 (0.60–1.47)", "status": "Stands", "statusType": "stands", "tags": [["ok", "Self-controlled"]]}, {"id": "madsen", "short": "Madsen 2002", "name": "Madsen et al. 2002", "where": "New England Journal of Medicine · Denmark", "camp": "safety", "n": 537303, "nShort": "537,303", "design": "Nationwide cohort (every child born in Denmark 1991–1998)", "nText": "537,303 children (440,655 vaccinated, 96,648 not)", "control": "Yes: unvaccinated Danish children born in the same years", "outcome": "Autism diagnoses by child psychiatrists in the national psychiatric register; a sample of records was checked (37 of 40 confirmed)", "controls": "Adjusted for age, calendar period, sex, birth weight, gestational age, mother's education, socioeconomic status; also checked age at and time since vaccination", "funding": "Danish National Research Foundation, US CDC, and the National Alliance for Autism Research (an autism-parent charity). Co-author Poul Thorsen was later charged with stealing CDC grant money (2004–2008); no data problems were alleged", "finding": "No link: autism RR 0.92 (0.68–1.24)", "status": "Stands; replicated by Hviid 2019", "statusType": "stands", "tags": [["ok", "Population-wide"], ["ok", "Registry diagnoses"]]}, {"id": "smeeth", "short": "Smeeth 2004", "name": "Smeeth et al. 2004", "where": "The Lancet · UK general practice records", "camp": "safety", "n": 5763, "nShort": "5,763", "design": "Matched case-control study (UK General Practice Research Database)", "nText": "1,294 children with autism-spectrum diagnoses, 4,469 matched controls", "control": "Yes: controls matched on age, sex and GP practice", "outcome": "Diagnoses recorded by GPs", "controls": "Matching; results held for autism only, for vaccination before age 3, and for the period before the media scare", "funding": "UK Medical Research Council", "finding": "No link: OR 0.86 (0.68–1.09)", "status": "Stands", "statusType": "stands", "tags": [["ok", "Matched controls"]]}, {"id": "destefano", "short": "DeStefano 2004", "name": "DeStefano et al. 2004", "where": "Pediatrics · Atlanta, USA", "camp": "safety", "n": 2448, "nShort": "2,448", "design": "Case-control study of age at first MMR", "nText": "624 children with autism, 1,824 controls", "control": "Yes: controls matched on age, sex and school", "outcome": "Autism from a developmental-disabilities surveillance program; vaccine dates from school immunization forms", "controls": "Matching; a birth-certificate subsample adjusted for maternal and birth factors", "funding": "CDC (all authors were CDC staff). This is the study at the center of the \"CDC whistleblower\" claim (see section 4)", "finding": "Same age at vaccination in both groups. A small difference for vaccination before 36 months (OR 1.49) disappeared after adjustment (OR 1.23, 0.64–2.36) and was attributed to early-intervention programs requiring vaccination", "status": "Stands; a 2014 reanalysis attacking it was retracted", "statusType": "stands", "tags": [["ok", "Matched controls"], ["warn", "Whistleblower claim"]]}, {"id": "honda", "short": "Honda 2005", "name": "Honda, Shimizu & Rutter 2005", "where": "J Child Psychology & Psychiatry · Yokohama, Japan", "camp": "safety", "n": 31426, "nShort": "31,426", "design": "Natural experiment: whole-population study after Japan stopped using MMR in 1993", "nText": "31,426 children born 1988–1996 in one Yokohama ward", "control": "Before vs after: birth cohorts with falling, then zero, MMR use", "outcome": "All developmental-disorder diagnoses in the ward's screening system (ICD-10)", "controls": "Whole population, so no selection of who takes part; looks for whether autism falls when MMR disappears", "funding": "Not confirmed from full text", "finding": "No link: autism kept rising, most sharply in children born after MMR stopped", "status": "Stands", "statusType": "stands", "tags": [["ok", "Natural experiment"]]}, {"id": "hornig", "short": "Hornig 2008", "name": "Hornig et al. 2008", "where": "PLoS ONE · USA and Ireland", "camp": "safety", "n": 38, "nShort": "38", "design": "Blinded case-control repeat of the Uhlmann measles-RNA test", "nText": "38 children (25 with autism and bowel symptoms, 13 with bowel symptoms only)", "control": "Yes: children with the same bowel symptoms but no autism", "outcome": "Blinded PCR at three labs, including the original Dublin lab", "controls": "Statisticians held the sample codes until testing finished; all three labs had to agree", "funding": "CDC grant to the American Academy of Pediatrics, and NIH. Two co-authors from the original lab disclosed being paid expert witnesses for claimants", "finding": "No difference: measles RNA in 1 of 25 autism cases vs 1 of 13 controls", "status": "Stands", "statusType": "stands", "tags": [["ok", "Blinded"], ["ok", "Three labs agreed"]]}, {"id": "taylor14", "short": "Taylor 2014 (meta)", "name": "Taylor, Swerdfeger & Eslick 2014", "where": "Vaccine · meta-analysis", "camp": "safety", "n": 1266327, "nShort": "1.27M (pooled)", "design": "Meta-analysis of 5 cohort and 5 case-control studies", "nText": "1,256,407 children in cohort studies + 9,920 in case-control studies", "control": "Pools studies that each had comparison groups", "outcome": "As reported by each included study", "controls": "Random-effects pooling; separate analyses for MMR, thimerosal and mercury", "funding": "No funding statement found; authors declared no conflicts", "finding": "No link: MMR cohort studies OR 0.84 (0.70–1.01)", "status": "Stands", "statusType": "stands", "tags": [["ok", "Pooled evidence"]]}, {"id": "jain", "short": "Jain 2015", "name": "Jain et al. 2015", "where": "JAMA · US insurance claims", "camp": "safety", "n": 95727, "nShort": "95,727", "design": "Cohort of children with an older sibling, from a US commercial insurance database", "nText": "95,727 children, including 1,929 whose older sibling had autism", "control": "Yes: unvaccinated children within each sibling-risk group", "outcome": "Two or more insurance claims with an autism diagnosis code (validated: 87% accurate)", "controls": "Adjusted for prematurity, chronic conditions, parental education and age, income, race, sex, region and more; analyzed high-risk siblings separately", "funding": "US National Institute of Mental Health (no role in design). Run by The Lewin Group and Optum, both part of UnitedHealth Group, which owns the claims database used", "finding": "No link, even for younger siblings of autistic children: 2 doses RR 0.56 (0.31–1.01)", "status": "Stands", "statusType": "stands", "tags": [["ok", "High-risk siblings"], ["ok", "Many adjustments"]]}, {"id": "hviid", "short": "Hviid 2019", "name": "Hviid et al. 2019", "where": "Annals of Internal Medicine · Denmark", "camp": "safety", "n": 657461, "nShort": "657,461", "design": "Nationwide cohort (every child born in Denmark 1999–2010), followed to 2013", "nText": "657,461 children (31,619 unvaccinated), 6,517 autism diagnoses", "control": "Yes: unvaccinated Danish children, with vaccination status updated over time", "outcome": "Autism diagnoses recorded in national registers", "controls": "Adjusted for age, birth year, sex, other vaccines, autism in siblings and an autism risk score; checked high-risk subgroups and time windows after vaccination", "funding": "Novo Nordisk Foundation and Danish Ministry of Health. Authors work at Statens Serum Institut, a state agency that sold its vaccine production in 2016–17 (no source says it made MMR)", "finding": "No link: autism HR 0.93 (0.85–1.02), including in high-risk subgroups", "status": "Stands", "statusType": "stands", "tags": [["ok", "Population-wide"], ["ok", "Sibling-risk subgroups"]]}, {"id": "cochrane", "short": "Cochrane 2020", "name": "Cochrane review (Di Pietrantonj et al. 2020)", "where": "Cochrane Database of Systematic Reviews", "camp": "safety", "n": 23480668, "nShort": "23.5M (pooled)", "design": "Systematic review of 138 studies on MMR/MMRV effectiveness and harms", "nText": "23,480,668 participants across 138 studies", "control": "Includes randomized trials, cohort, case-control and self-controlled studies", "outcome": "As reported by each included study; certainty graded with GRADE", "controls": "Independent reviewers grade risk of bias for every study", "funding": "Cochrane; authors declared no known conflicts", "finding": "No link to autism (RR 0.93, 0.85–1.01). Confirms real but rare harms: febrile seizures, ITP", "status": "Stands", "statusType": "stands", "tags": [["ok", "Independent review"]]}, {"id": "wakefield", "short": "Wakefield 1998", "name": "Wakefield et al. 1998", "where": "The Lancet · London, UK", "camp": "cited", "n": 12, "nShort": "12", "design": "Case series (\"early report\"); no statistical test of MMR", "nText": "12 children", "control": "None for the MMR question", "outcome": "Parents' recollection of when symptoms began. Medical records later contradicted the paper for several children (BMJ 2011)", "controls": "None. No blinding described; Wakefield was one of three people reviewing the biopsies", "funding": "Stated: hospital special trustees and a children's charity. Not disclosed: Wakefield was being paid by a lawyer preparing a lawsuit against MMR makers (£435,643 plus expenses in total, per BMJ 2011), including £55,000 from the Legal Aid Board (per The Lancet's editor)", "finding": "Suggested MMR might trigger bowel disease and regression (the paper itself said it \"did not prove an association\")", "status": "Retracted 2010; Wakefield struck off", "statusType": "retracted", "tags": [["bad", "No control group"], ["bad", "Undisclosed payments"], ["bad", "Retracted"]]}, {"id": "uhlmann", "short": "Uhlmann 2002", "name": "Uhlmann et al. 2002", "where": "Molecular Pathology · Unigenetics lab, Dublin", "camp": "cited", "n": 161, "nShort": "161", "design": "Lab test (PCR) for measles virus RNA in stored gut biopsies", "nText": "91 children with bowel and developmental problems, 70 controls", "control": "Yes, but a mixed group (including appendix samples), not matched", "outcome": "PCR testing at the Unigenetics lab", "controls": "No blinding described", "funding": "Charities including Medical Interventions for Autism. Wakefield was a co-author. The lab's leaders later disclosed being paid expert witnesses for claimants in UK MMR litigation", "finding": "Claimed measles RNA in 75 of 91 children vs 5 of 70 controls", "status": "Lab found unreliable in US vaccine court; blinded repeat found nothing", "statusType": "refuted", "tags": [["bad", "Lab contamination"], ["bad", "Not blinded"], ["warn", "Not reproducible"]]}, {"id": "singh", "short": "Singh 2002", "name": "Singh et al. 2002", "where": "Journal of Biomedical Science · USA", "camp": "cited", "n": 217, "nShort": "217", "design": "Blood antibody (serology) comparison", "nText": "125 autistic children, 92 controls", "control": "Yes, but the abstract does not say how controls were chosen", "outcome": "Lab antibody tests", "controls": "Not described in the abstract", "funding": "Not confirmed", "finding": "Claimed an \"unusual\" MMR antibody in 60% of autistic children and none of the controls", "status": "Never replicated; a 2008 study of 240 children found no difference in measles antibodies", "statusType": "refuted", "tags": [["warn", "Never replicated"]]}, {"id": "hooker", "short": "Hooker 2014", "name": "Hooker 2014", "where": "Translational Neurodegeneration · reanalysis of CDC data", "camp": "cited", "n": 2448, "nShort": "2,448 (reused)", "design": "Reanalysis of DeStefano 2004 data, treating a matched case-control study as a cohort", "nText": "The same 2,448 children as DeStefano 2004, split into race and sex subgroups", "control": "Dropped the age, sex and school matching that the original design relied on", "outcome": "Same records as DeStefano 2004", "controls": "No adjustment for other vaccines or socioeconomic status (acknowledged in the paper); many subgroups tested, raising the odds of a chance finding", "funding": "Focus Autism, Inc. Hooker had a pending vaccine-injury claim for his own son (rejected in 2016); the journal cited undeclared competing interests", "finding": "Claimed 3.36× risk for African American boys vaccinated before 36 months", "status": "Retracted Oct 2014", "statusType": "retracted", "tags": [["bad", "Broke matched design"], ["bad", "Undeclared interests"], ["bad", "Retracted"]]}, {"id": "mawson", "short": "Mawson 2017", "name": "Mawson et al. 2017", "where": "Journal of Translational Science · USA", "camp": "cited", "n": 666, "nShort": "666", "design": "Anonymous online survey of homeschooling mothers (convenience sample)", "nText": "666 children (261 unvaccinated) reported by 415 mothers", "control": "Compares vaccinated and unvaccinated children, but families chose to take part", "outcome": "Mothers' yes/no answers; no medical or vaccination records checked (the authors acknowledge this)", "controls": "No response rate or way to check who took part; vaccinated children had more check-ups, so more chances to be diagnosed", "funding": "Generation Rescue and the Children's Medical Safety Research Institute, groups that campaign on vaccine harms", "finding": "Claimed autism in 4.7% of vaccinated vs 1.0% of unvaccinated (vaccines in general, not MMR)", "status": "Withdrawn by Frontiers before publication; later published in a small journal", "statusType": "flawed", "tags": [["bad", "Self-reported"], ["bad", "Self-selected sample"], ["warn", "Advocacy-funded"]]}];
+const EFFECTS = [{"name": "Madsen 2002 · Denmark", "est": 0.92, "lo": 0.68, "hi": 1.24, "big": true, "note": "537,303 children; autistic disorder, adjusted RR."}, {"name": "Hviid 2019 · Denmark", "est": 0.93, "lo": 0.85, "hi": 1.02, "big": true, "note": "657,461 children; fully adjusted hazard ratio."}, {"name": "Smeeth 2004 · UK", "est": 0.86, "lo": 0.68, "hi": 1.09, "note": "1,294 cases vs 4,469 matched controls; odds ratio."}, {"name": "Taylor 1999 · UK", "est": 0.94, "lo": 0.6, "hi": 1.47, "note": "Self-controlled: autism onset within 1 year of MMR vs other times (relative incidence)."}, {"name": "Jain 2015 · high-risk siblings", "est": 0.56, "lo": 0.31, "hi": 1.01, "note": "Younger siblings of autistic children, 2 doses by age 5 (adjusted RR)."}, {"name": "Jain 2015 · other siblings", "est": 1.12, "lo": 0.78, "hi": 1.59, "note": "Children whose older sibling did not have autism, 2 doses by age 5."}, {"name": "Meta-analysis 2014 (cohorts)", "est": 0.84, "lo": 0.7, "hi": 1.01, "pooled": true, "note": "Taylor et al. 2014, pooled MMR cohort studies (odds ratio)."}];
+const DIVES = [{"title": "Wakefield et al. 1998: the paper that started it", "meta": "The Lancet · 12 children · 13 authors", "tags": [["bad", "No control group"], ["bad", "Undisclosed payments"], ["bad", "Altered case histories"], ["bad", "Retracted"]], "claim": "Twelve children developed bowel disease and lost developmental skills, and in eight of them parents linked the start of symptoms to MMR. At a press conference Wakefield recommended single vaccines instead of MMR.", "problems": ["12 children and no comparison group: with MMR given at the age autism signs usually appear, some children will show signs soon after the shot by coincidence.", "The children were not \"consecutively referred\" as claimed. Many families came through anti-MMR campaigners and a lawyer preparing a lawsuit (BMJ 2011).", "Hospital records did not match the paper: 3 of the 9 children described as having regressive autism had no autism diagnosis, 5 of the 12 \"previously normal\" children had earlier developmental concerns, and in 9 cases normal bowel biopsy results were changed to \"colitis\" after a review.", "Wakefield was paid £435,643 plus expenses through the lawyer's firm, starting two years before publication, and filed a patent application in 1997 for a product the BMJ says included a rival measles vaccine (Wakefield denies the vaccine claim). None of this was disclosed."], "after": ["2004: 10 of the 13 authors retracted the paper's interpretation; The Lancet's editor said £55,000 of Legal Aid Board money should have been declared.", "2010: The Lancet fully retracted the paper after the UK General Medical Council found its claims about referrals and ethics approval false. Wakefield was struck off the medical register.", "2011: The BMJ published an investigation and an editorial calling the paper \"fraudulent\"."], "verdict": "A tiny uncontrolled case series, built on misreported records and undisclosed litigation money. Not evidence of anything."}, {"title": "Measles virus in children's guts (Uhlmann 2002)", "meta": "Molecular Pathology · 91 cases, 70 controls · Unigenetics lab, Dublin", "tags": [["bad", "Contaminated tests"], ["bad", "Not blinded"], ["ok", "Refuted by blinded repeat"]], "claim": "A PCR test found measles virus RNA in the gut tissue of 75 of 91 children with autism and bowel disease, but only 5 of 70 controls. This was used as biological proof of Wakefield's theory.", "problems": ["No blinding: the lab knew which samples came from which group.", "An expert who inspected the lab's records (Stephen Bustin, retained by vaccine makers in UK litigation) testified that negative controls came back positive in about a third of runs, notebooks were altered after the fact, and \"positive\" results appeared even when a step required to detect an RNA virus was skipped, a sign of contamination.", "Wakefield was a co-author, and the lab's leaders were later paid expert witnesses for families suing over MMR."], "after": ["2008: Hornig et al. repeated the test blind in three labs, including the original Dublin lab. Measles RNA turned up in 1 of 25 children with autism and 1 of 13 controls: no difference.", "2009: The US vaccine court ruled it \"not likely\" that the lab \"ever reliably detected\" measles virus in that study. The lab had closed."], "verdict": "The positive results came from a contaminated, unblinded lab process. When tested properly, the effect vanished."}, {"title": "\"CDC whistleblower\" and the Hooker reanalysis (2014)", "meta": "Translational Neurodegeneration · reanalysis of DeStefano 2004 data", "tags": [["bad", "Broke matched design"], ["bad", "Subgroup fishing"], ["bad", "Retracted"]], "claim": "CDC scientists hid that African American boys vaccinated before 36 months had 3.36 times the autism risk. CDC co-author William Thompson said data had been omitted. The claim became the 2016 film \"Vaxxed\", directed by Andrew Wakefield.", "problems": ["The original study matched each autistic child with controls of the same age, sex and school. Hooker discarded that matching and analyzed the data as if it were a cohort, which the design can't support.", "Splitting data into many race and sex subgroups makes chance \"hits\" likely. The original authors' adjusted analysis found no significant difference (OR 1.23, 0.64–2.36), and attributed the crude 36-month gap to early-intervention programs that require vaccination.", "Hooker had a pending vaccine-injury claim for his own son, later rejected. The paper was funded by Focus Autism.", "Thompson's own statement added: \"I would never suggest that any parent avoid vaccinating children of any race.\""], "after": ["Oct 2014: retracted for undeclared competing interests and concerns about \"the validity of the methods and statistical analysis\".", "Larger studies since, including Hviid 2019 (657,461 children) and Jain 2015, found no increased risk in any group."], "verdict": "A retracted reanalysis that broke the study's design to find one subgroup result."}, {"title": "\"Vaccinated vs. unvaccinated\" survey (Mawson 2017)", "meta": "Journal of Translational Science · online survey · 666 children", "tags": [["bad", "Self-reported"], ["bad", "Self-selected sample"], ["warn", "Advocacy-funded"]], "claim": "Vaccinated homeschooled children had about four times the rate of autism of unvaccinated ones (4.7% vs 1.0%).", "problems": ["An anonymous online survey passed around homeschool groups: no one knows who saw it or why some families answered.", "Diagnoses and vaccination status were whatever mothers reported; no records were checked, as the authors acknowledge.", "Vaccinated children had more check-ups (57.5% vs 37.1% in the past year), so they had more chances to be diagnosed with anything.", "Funded by Generation Rescue and the Children's Medical Safety Research Institute, groups that campaign on vaccine harms. It is about vaccines in general, not MMR."], "after": ["2016: Frontiers in Public Health withdrew it after provisional acceptance.", "2017: published in a small open-access journal."], "verdict": "A self-selected, self-reported survey can't separate vaccines from differences in who answered and who sees doctors."}, {"title": "\"A Danish study author was a fraudster\" (Thorsen)", "meta": "About Madsen et al. 2002 · co-author Poul Thorsen", "tags": [["warn", "True fact, wrong conclusion"]], "claim": "Poul Thorsen, a co-author of the 2002 Danish MMR study, stole CDC money, so the Danish research can't be trusted.", "problems": ["The charges are financial: from 2004 to 2008 he submitted forged invoices and diverted over $1 million of CDC grant money for personal use (US Department of Justice).", "No charge or investigation alleged falsified research data. The fraud period began after the 2002 paper was published, and he was 6th of 8 authors.", "The result doesn't rest on him: a second Danish study without him (Hviid 2019, 657,461 children) found the same thing, as did studies in the UK, the US and Japan."], "after": ["2011: indicted in Atlanta.", "2026: after extradition, pleaded guilty to wire fraud (US Department of Justice)."], "verdict": "A real theft of grant money, but it doesn't touch the data, and the finding was independently replicated."}, {"title": "MMR antibodies in autistic children (Singh 2002)", "meta": "Journal of Biomedical Science · 125 cases, 92 controls", "tags": [["warn", "Never replicated"]], "claim": "60% of autistic children had an \"unusual\" antibody to MMR, and none of the controls did, suggesting an abnormal immune reaction to the vaccine.", "problems": ["The abstract doesn't say how controls were chosen or whether testing was blinded.", "A lab finding like this has to be reproduced by other groups before it means much."], "after": ["2008: Baird et al. compared measles antibody responses in 98 children with autism, 52 with other special needs and 90 typically developing children: no difference, and no link to autism symptoms.", "No independent study has reproduced the specific antibody finding."], "verdict": "An unreplicated lab result that a larger, better-described study did not support."}];
+const FUNDING = {"intro": "A common objection is that safety studies are paid for by governments or by groups tied to vaccine makers. Funding is worth checking, so here it is. The finding of no link comes from many funders in five countries (Denmark, the UK, the US, Japan and Ireland), using different designs, including a Japanese natural experiment and a blinded repeat run partly by the very lab that first reported measles virus in children's guts. The main studies claiming a link were paid for by litigation or advocacy money, and in Wakefield's case the payments were hidden.", "groups": [{"title": "Governments & public research councils", "desc": "Critics argue that health agencies have a stake in vaccine programs. That is why it matters that the same answer comes from different agencies, countries and teams.", "items": [{"study": "Madsen 2002", "camp": "safety", "who": "Danish National Research Foundation; US CDC; plus an autism-parent charity"}, {"study": "Hviid 2019", "camp": "safety", "who": "Danish Ministry of Health; Novo Nordisk Foundation (a charitable foundation). Authors work at Statens Serum Institut, a state agency that sold its vaccine production in 2016–17"}, {"study": "Smeeth 2004", "camp": "safety", "who": "UK Medical Research Council"}, {"study": "DeStefano 2004", "camp": "safety", "who": "US CDC (authors were CDC staff)"}, {"study": "Jain 2015", "camp": "safety", "who": "US National Institute of Mental Health; run by UnitedHealth's Lewin Group and Optum"}, {"study": "Hornig 2008", "camp": "safety", "who": "CDC grant to the American Academy of Pediatrics; US NIH"}]}, {"title": "Charities, foundations & independent reviewers", "desc": "Includes reviewers who declared no conflicts, and charity funding on both sides.", "items": [{"study": "Cochrane review 2020", "camp": "safety", "who": "Cochrane; authors declared no known conflicts"}, {"study": "Meta-analysis 2014", "camp": "safety", "who": "No funding reported; authors declared no conflicts"}, {"study": "Uhlmann 2002", "camp": "cited", "who": "Charities incl. Medical Interventions for Autism; lab leaders later paid expert witnesses for claimants"}]}, {"title": "Litigation & advocacy money", "desc": "Money from lawsuits or campaigns that already had a position on the answer.", "items": [{"study": "Wakefield 1998", "camp": "cited", "who": "Undisclosed: £435,643 plus expenses via a lawyer suing MMR makers, incl. £55,000 of Legal Aid Board money"}, {"study": "Hooker 2014", "camp": "cited", "who": "Focus Autism; author had a pending vaccine-injury claim"}, {"study": "Mawson 2017", "camp": "cited", "who": "Generation Rescue; Children's Medical Safety Research Institute"}]}]};
+const TIMELINE = [{"year": "1988", "kind": "safety", "title": "UK introduces the MMR vaccine", "text": "Autism rates in North London show no jump afterwards (Taylor 1999)."}, {"year": "1993", "kind": "safety", "title": "MMR use ends in Yokohama, Japan", "text": "Not a single MMR dose is given in the city from 1993 on; autism diagnoses keep rising anyway (Honda 2005)."}, {"year": "1996", "kind": "cited", "title": "A lawyer hires Wakefield", "text": "Solicitor Richard Barr engages Wakefield in February; a protocol and costing go to the Legal Aid Board in June, before any of the 12 children are investigated."}, {"year": "1998", "kind": "cited", "title": "Wakefield's Lancet paper", "text": "12 children, no control group. Wakefield recommends single vaccines at a press conference."}, {"year": "1999", "kind": "safety", "title": "Taylor et al., The Lancet", "text": "498 autism cases: no clustering of onset after MMR."}, {"year": "2002", "kind": "safety", "title": "Madsen et al., NEJM", "text": "537,303 Danish children: no link. The same year, Uhlmann et al. report measles RNA in gut biopsies."}, {"year": "2003–04", "kind": "impact", "title": "MMR uptake in England hits its low point", "text": "79.9% of two-year-olds vaccinated, down from 91.8% in 1995–96."}, {"year": "2004", "kind": "safety", "title": "Retraction of interpretation; more studies", "text": "10 of 13 Wakefield authors withdraw the paper's interpretation. DeStefano (US), Smeeth (UK) and the US Institute of Medicine all find no link."}, {"year": "2006", "kind": "impact", "title": "Measles returns to England and Wales", "text": "Endemic transmission is re-established; a child with an underlying immune condition dies of measles."}, {"year": "2008", "kind": "safety", "title": "Blinded repeat of the gut-virus test", "text": "Hornig et al., with three labs including the original one: no difference between children with and without autism."}, {"year": "2009", "kind": "safety", "title": "US vaccine court rejects the MMR theory", "text": "All three test cases in the Autism Omnibus Proceeding are denied; the rulings are upheld on appeal."}, {"year": "2010", "kind": "cited", "title": "Full retraction; Wakefield struck off", "text": "The Lancet retracts the paper in February; the General Medical Council strikes Wakefield off in May."}, {"year": "2011", "kind": "cited", "title": "BMJ calls the paper fraudulent", "text": "Investigation shows case histories were changed. Separately, Danish co-author Poul Thorsen is indicted for stealing CDC grant money."}, {"year": "2014", "kind": "cited", "title": "Hooker reanalysis published, then retracted", "text": "Published in August with the \"CDC whistleblower\" statement; retracted in October. A meta-analysis of 1.27 million children finds no link."}, {"year": "2015", "kind": "safety", "title": "Jain et al., JAMA", "text": "95,727 US children, including younger siblings of autistic children: no link."}, {"year": "2016", "kind": "cited", "title": "\"Vaxxed\" film", "text": "Directed by Andrew Wakefield, built around the \"CDC whistleblower\" claims."}, {"year": "2019", "kind": "safety", "title": "Hviid et al., Annals of Internal Medicine", "text": "657,461 Danish children: no link, including in high-risk groups."}, {"year": "2020", "kind": "safety", "title": "Cochrane review", "text": "138 studies, 23.5 million participants: no link to autism; confirms rare febrile seizures and ITP."}, {"year": "2026", "kind": "impact", "title": "Thorsen pleads guilty to wire fraud", "text": "A financial crime over grant money; no research data was alleged to be falsified."}];
+const RISKS = [{"src": "vaccine", "label": "Febrile seizure", "text": "1 in 3,000–4,000 doses", "lo": 250, "hi": 333}, {"src": "vaccine", "label": "Low platelets (ITP)", "text": "about 1 in 40,000 doses", "lo": 25, "hi": 25}, {"src": "vaccine", "label": "Severe allergic reaction", "text": "1.8–14.4 per million doses", "lo": 1.8, "hi": 14.4}, {"src": "measles", "label": "Pneumonia", "text": "up to 1 in 20 children", "lo": 50000, "hi": 50000}, {"src": "measles", "label": "Death (US children)", "text": "1–3 in 1,000", "lo": 1000, "hi": 3000}, {"src": "measles", "label": "Encephalitis", "text": "about 1 in 1,000", "lo": 1000, "hi": 1000}, {"src": "measles", "label": "SSPE, caught young", "text": "1 in 600–1,400 (under 5)", "lo": 731, "hi": 1642}, {"src": "measles", "label": "SSPE, overall", "text": "4–11 per 100,000", "lo": 40, "hi": 110}];
+const SOURCES = [{"t": "Madsen KM et al. N Engl J Med 2002;347:1477–82.", "u": "https://pubmed.ncbi.nlm.nih.gov/12421889/"}, {"t": "Hviid A et al. Ann Intern Med 2019;170:513–20.", "u": "https://pubmed.ncbi.nlm.nih.gov/30831578/"}, {"t": "Taylor B et al. Lancet 1999;353:2026–9.", "u": "https://pubmed.ncbi.nlm.nih.gov/10376617/"}, {"t": "Smeeth L et al. Lancet 2004;364:963–9.", "u": "https://pubmed.ncbi.nlm.nih.gov/15364187/"}, {"t": "DeStefano F et al. Pediatrics 2004;113:259–66.", "u": "https://pubmed.ncbi.nlm.nih.gov/14754936/"}, {"t": "Honda H, Shimizu Y, Rutter M. J Child Psychol Psychiatry 2005;46:572–9.", "u": "https://pubmed.ncbi.nlm.nih.gov/15877763/"}, {"t": "Jain A et al. JAMA 2015;313:1534–40.", "u": "https://jamanetwork.com/journals/jama/fullarticle/2275444"}, {"t": "Taylor LE, Swerdfeger AL, Eslick GD. Vaccine 2014;32:3623–9.", "u": "https://pubmed.ncbi.nlm.nih.gov/24814559/"}, {"t": "Di Pietrantonj C et al. Cochrane Database Syst Rev 2020;4:CD004407.", "u": "https://pubmed.ncbi.nlm.nih.gov/32309885/"}, {"t": "Institute of Medicine. Immunization Safety Review: Vaccines and Autism. 2004.", "u": "https://www.nationalacademies.org/read/10997/chapter/2"}, {"t": "Hornig M et al. PLoS ONE 2008;3:e3140.", "u": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0003140"}, {"t": "Wakefield AJ et al. Lancet 1998;351:637–41 (retracted).", "u": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(97)11096-0/fulltext"}, {"t": "The Lancet. Retraction notice, 2010.", "u": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(10)60175-4/fulltext"}, {"t": "Retraction of an interpretation. Lancet 2004;363:750.", "u": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(04)15715-2/fulltext"}, {"t": "BMJ news on the 2004 retraction and Legal Aid funding. BMJ 2004;328:602.", "u": "https://pmc.ncbi.nlm.nih.gov/articles/PMC381161/"}, {"t": "Deer B. How the case against the MMR vaccine was fixed. BMJ 2011;342:c5347.", "u": "https://www.bmj.com/content/342/bmj.c5347"}, {"t": "GMC strikes off Wakefield. BMJ 2010;340:c2803.", "u": "https://www.bmj.com/content/340/bmj.c2803"}, {"t": "Uhlmann V et al. Mol Pathol 2002;55:84–90.", "u": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1187154/"}, {"t": "US Court of Federal Claims, Autism Omnibus decisions (Cedillo, Hazlehurst, Snyder), 2009.", "u": "https://uscfc.uscourts.gov/autism-decisions-and-background-information"}, {"t": "Hooker BS. Transl Neurodegener 2014;3:16 (retracted).", "u": "https://link.springer.com/article/10.1186/2047-9158-3-16"}, {"t": "Retraction notice. Transl Neurodegener 2014;3:22.", "u": "https://link.springer.com/article/10.1186/2047-9158-3-22"}, {"t": "Mawson AR et al. J Transl Sci 2017;3(3).", "u": "https://www.oatext.com/pdf/JTS-3-186.pdf"}, {"t": "Retraction Watch on the Mawson paper, 2017.", "u": "https://retractionwatch.com/2017/05/08/retracted-vaccine-autism-study-republished/"}, {"t": "Singh VK et al. J Biomed Sci 2002;9:359–64.", "u": "https://pubmed.ncbi.nlm.nih.gov/12145534/"}, {"t": "Baird G et al. Arch Dis Child 2008;93:832–7.", "u": "https://pubmed.ncbi.nlm.nih.gov/18252754/"}, {"t": "US Department of Justice: Thorsen pleads guilty, 2026.", "u": "https://www.justice.gov/usao-ndga/pr/danish-autism-researcher-extradited-after-14-years-run-pleads-guilty-stealing-cdc"}, {"t": "CDC Pink Book, Measles chapter (vaccine adverse events).", "u": "https://www.cdc.gov/pinkbook/hcp/table-of-contents/chapter-13-measles.html"}, {"t": "ACIP. Prevention of measles, rubella, CRS, and mumps, 2013. MMWR 62(RR-4).", "u": "https://www.cdc.gov/mmwr/preview/mmwrhtml/rr6204a1.htm"}, {"t": "CDC. Measles clinical overview.", "u": "https://www.cdc.gov/measles/hcp/clinical-overview/index.html"}, {"t": "CDC. Measles symptoms and complications.", "u": "https://www.cdc.gov/measles/signs-symptoms/index.html"}, {"t": "Wendorf KA et al. SSPE risk, California. Clin Infect Dis 2017;65:226–32.", "u": "https://pubmed.ncbi.nlm.nih.gov/28387784/"}, {"t": "CDC. Thimerosal and vaccines (MMR never contained thimerosal).", "u": "https://www.cdc.gov/vaccine-safety/about/thimerosal.html"}, {"t": "NHS Immunisation Statistics, England 2010–11 (MMR coverage history).", "u": "https://data.parliament.uk/DepositedPapers/Files/DEP2012-0167/DEP2012-0167.pdf"}, {"t": "UKHSA Green Book, chapter 21: Measles.", "u": "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/147968/Green-Book-Chapter-21-v2_0.pdf"}, {"t": "UKHSA. Measles: historic confirmed cases, notifications and deaths.", "u": "https://www.gov.uk/government/publications/measles-historic-confirmed-cases-notifications-and-deaths/measles-historic-confirmed-cases-notifications-and-deaths"}];
+const STATS = [{"v": "12", "k": "children in the paper that started the MMR scare (retracted)", "cls": "claim"}, {"v": "1,194,764", "k": "children in the two Danish nationwide studies: no link", "cls": "safe"}, {"v": "23.5M", "k": "participants in 138 studies reviewed by Cochrane in 2020", "cls": "safe"}, {"v": "79.9%", "k": "MMR uptake in England at its 2003–04 low, down from 91.8%", "cls": ""}];
+
+const GUIDE = [
+  { t: 'Is there a comparison group?', a: 'Without one, you can\'t tell whether autism was more common after MMR or just as common as in any group of children. Autism signs often become noticeable around 12–18 months, the same age MMR is given, so some children will be diagnosed soon after the shot by coincidence.', b: 'Good studies compare vaccinated with unvaccinated children, or the same population before and after a change.' },
+  { t: 'How big is the sample?', a: 'With a dozen children, a few coincidences can look like a pattern. Large samples shrink the role of chance and give narrow confidence intervals.', b: 'The Danish registry studies followed every child born in the country over several years.' },
+  { t: 'How was autism measured?', a: 'Asking parents to remember when symptoms began invites recall bias, especially once they have heard a vaccine might be to blame.', b: 'Stronger studies use diagnoses recorded by doctors in medical or national registries, made without reference to the study.' },
+  { t: 'Were other differences accounted for?', a: 'Vaccinated and unvaccinated families can differ in age, income, health care use and family history of autism. Those differences can create or hide an apparent link (confounding).', b: 'Good studies adjust for these factors, or look at high-risk groups such as younger siblings of autistic children.' },
+  { t: 'Who paid, and was it disclosed?', a: 'Funding doesn\'t make a result wrong, but undisclosed conflicts of interest are a red flag. So is a study run or paid for by a group with a stake in the answer.', b: 'Look for consistent results from different funders, countries and research teams.' },
+  { t: 'Was it replicated?', a: 'One surprising result is a reason to investigate, not a conclusion. If careful repeats can\'t find the effect, the first finding was probably chance, bias or error.', b: 'The MMR-autism link has been tested in many countries and designs, and the repeats keep finding no link.' },
+];
+
+/* ================= HELPERS ================= */
+function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function svgEl(w, h, inner, label) { return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}">${inner}</svg>`; }
+const log10 = Math.log10;
+
+/* ================= STATS ================= */
+$('stats').innerHTML = STATS.map(s => `<div class="card stat"><div class="v ${s.cls || ''}">${esc(s.v)}</div><div class="k">${esc(s.k)}</div></div>`).join('');
+
+/* ================= SAMPLE SIZE CHART ================= */
+function drawSize() {
+  const host = $('sizeChart');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 560;
+  const rows = STUDIES.filter(s => s.n).slice().sort((a, b) => a.n - b.n);
+  const labelW = narrow ? 118 : 190, padR = narrow ? 58 : 80, rowH = 30, top = 6, axisH = 24;
+  const H = top + rows.length * rowH + axisH;
+  const lo = 1, hi = 7; // 10^1 .. 10^7
+  const X = n => labelW + (log10(Math.max(10, n)) - lo) / (hi - lo) * (W - labelW - padR);
+  let g = '';
+  // grid
+  for (let p = lo; p <= hi; p++) {
+    const x = X(Math.pow(10, p));
+    g += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - axisH}" stroke="var(--line)"/>`;
+    const lab = p < 3 ? String(Math.pow(10, p)) : p < 6 ? Math.pow(10, p - 3) + 'k' : Math.pow(10, p - 6) + 'M';
+    if (!narrow || p % 2 === 1) g += `<text x="${x}" y="${H - 6}" font-size="11" fill="var(--muted)" text-anchor="middle">${lab}</text>`;
+  }
+  g += `<defs><pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><rect width="3" height="6" fill="var(--claim)"/></pattern></defs>`;
+  rows.forEach((s, i) => {
+    const y = top + i * rowH, bh = 18, by = y + (rowH - bh) / 2;
+    const col = s.camp === 'safety' ? 'var(--safe)' : 'var(--claim)';
+    const x0 = labelW, x1 = X(s.n);
+    const retracted = s.statusType === 'retracted';
+    const name = narrow ? s.short : `${s.short}`;
+    g += `<g class="bar" data-id="${s.id}" tabindex="0" style="cursor:pointer">`;
+    g += `<rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>`;
+    g += `<text x="${labelW - 8}" y="${y + rowH / 2 + 4}" font-size="${narrow ? 11.5 : 13}" fill="var(--ink)" text-anchor="end">${esc(name)}</text>`;
+    g += `<rect x="${x0}" y="${by}" width="${Math.max(2, x1 - x0)}" height="${bh}" rx="3" fill="${retracted ? 'url(#hatch)' : col}" stroke="${retracted ? col : 'none'}"/>`;
+    const val = narrow ? String(s.nShort || fmt(s.n)).replace(/ \((pooled|reused)\)| cases/, '') : (s.nShort || fmt(s.n));
+    g += `<text x="${x1 + 6}" y="${y + rowH / 2 + 4}" font-size="12" fill="var(--muted)">${esc(val)}</text>`;
+    g += `</g>`;
+  });
+  host.innerHTML = svgEl(W, H, g, 'Bar chart of study sample sizes on a log scale');
+  host.querySelectorAll('.bar').forEach(el => {
+    const show = () => {
+      const s = STUDIES.find(z => z.id === el.dataset.id);
+      $('sizeReadout').innerHTML = `<b>${esc(s.name)}</b> · ${esc(s.design)} · ${esc(s.nText)}. ${esc(s.finding)}${s.status ? ' · <b>' + esc(s.status) + '</b>' : ''}`;
+      host.querySelectorAll('.bar').forEach(o => o.style.opacity = o === el ? 1 : .45);
+    };
+    el.addEventListener('mouseenter', show); el.addEventListener('focus', show); el.addEventListener('click', show);
+  });
+  host.addEventListener('mouseleave', () => host.querySelectorAll('.bar').forEach(o => o.style.opacity = 1));
+}
+
+/* ================= FOREST PLOT ================= */
+function drawForest() {
+  const host = $('forest');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 560;
+  const labelW = narrow ? 10 : 230, padR = narrow ? 10 : 150, rowH = narrow ? 50 : 38, top = 22, axisH = 40;
+  const H = top + EFFECTS.length * rowH + axisH;
+  const lo = log10(0.25), hi = log10(2.5);
+  const X = v => labelW + (log10(v) - lo) / (hi - lo) * (W - labelW - padR);
+  let g = '';
+  // shading + reference line
+  g += `<rect x="${X(1)}" y="${top - 6}" width="${X(2.5) - X(1)}" height="${H - top - axisH + 6}" fill="var(--claim-soft)" opacity=".55"/>`;
+  g += `<rect x="${X(0.25)}" y="${top - 6}" width="${X(1) - X(0.25)}" height="${H - top - axisH + 6}" fill="var(--safe-soft)" opacity=".55"/>`;
+  g += `<text x="${X(1) + 6}" y="${top - 9}" font-size="11" fill="var(--claim)">${narrow ? 'more autism →' : 'MMR group more autism →'}</text>`;
+  g += `<text x="${X(1) - 6}" y="${top - 9}" font-size="11" fill="var(--safe)" text-anchor="end">${narrow ? '← less autism' : '← MMR group less autism'}</text>`;
+  for (const v of [0.25, 0.5, 1, 2]) {
+    const x = X(v);
+    g += `<line x1="${x}" x2="${x}" y1="${top - 6}" y2="${H - axisH}" stroke="${v === 1 ? 'var(--ink)' : 'var(--line)'}" stroke-width="${v === 1 ? 1.5 : 1}"/>`;
+    g += `<text x="${x}" y="${H - axisH + 16}" font-size="11" fill="var(--muted)" text-anchor="middle">${v}</text>`;
+  }
+  g += `<text x="${narrow ? labelW + (W - labelW - padR) / 2 : X(1)}" y="${H - 6}" font-size="11.5" fill="var(--muted)" text-anchor="middle">${narrow ? 'Relative risk (1 = no difference)' : 'Relative risk of autism, MMR vs. no MMR (1 = no difference)'}</text>`;
+  EFFECTS.forEach((e, i) => {
+    const y = top + i * rowH + rowH / 2 + (narrow ? 8 : 0);
+    if (narrow) g += `<text x="${labelW}" y="${y - 12}" font-size="12" fill="var(--ink)" font-weight="600">${esc(e.name)} <tspan fill="var(--muted)" font-weight="400">${e.est.toFixed(2)} (${e.lo.toFixed(2)}–${e.hi.toFixed(2)})</tspan></text>`;
+    else g += `<text x="${labelW - 10}" y="${y + 4}" font-size="13" fill="var(--ink)" text-anchor="end" font-weight="600">${esc(e.name)}</text>`;
+    if (!narrow) g += `<text x="${W - padR + 12}" y="${y + 4}" font-size="12" fill="var(--muted)">${e.est.toFixed(2)} (${e.lo.toFixed(2)}–${e.hi.toFixed(2)})</text>`;
+    const xl = X(Math.max(0.25, e.lo)), xh = X(Math.min(2.5, e.hi)), xe = X(e.est);
+    g += `<line x1="${xl}" x2="${xh}" y1="${y}" y2="${y}" stroke="var(--safe)" stroke-width="2.2"/>`;
+    g += `<line x1="${xl}" x2="${xl}" y1="${y - 5}" y2="${y + 5}" stroke="var(--safe)" stroke-width="2"/><line x1="${xh}" x2="${xh}" y1="${y - 5}" y2="${y + 5}" stroke="var(--safe)" stroke-width="2"/>`;
+    const sz = e.big ? 13 : 10;
+    g += e.pooled
+      ? `<path d="M${xe - 9} ${y} L${xe} ${y - 7} L${xe + 9} ${y} L${xe} ${y + 7} Z" fill="var(--safe)"/>`
+      : `<rect x="${xe - sz / 2}" y="${y - sz / 2}" width="${sz}" height="${sz}" fill="var(--safe)"/>`;
+  });
+  if (!narrow) g += `<text x="${W - padR + 12}" y="${top - 9}" font-size="11" fill="var(--muted)">estimate (95% CI)</text>`;
+  host.innerHTML = svgEl(W, H, g, 'Forest plot of autism risk estimates for MMR');
+  $('forestCap').innerHTML = EFFECTS.map(e => `<b>${esc(e.name)}:</b> ${esc(e.note)}`).join('<br>');
+}
+
+/* ================= STUDY MATRIX ================= */
+let filter = 'all';
+function pills(list) { return (list || []).map(p => `<span class="pill ${p[0]}">${esc(p[1])}</span>`).join(''); }
+function drawMatrix() {
+  const cols = ['Study', 'Design & sample', 'Comparison group', 'How autism was measured', 'Bias controls', 'Funding & conflicts'];
+  let h = `<div class="srow head">${cols.map(c => `<div>${c}</div>`).join('')}</div>`;
+  for (const s of STUDIES) {
+    if (filter !== 'all' && s.camp !== filter) continue;
+    h += `<div class="srow ${s.camp}">
+      <div class="sname">${esc(s.name)}<small>${esc(s.where)}</small><div style="margin-top:6px">${pills(s.tags)}</div></div>
+      <div><span class="lbl">${cols[1]}</span>${esc(s.design)}<br><b>${esc(s.nText)}</b></div>
+      <div><span class="lbl">${cols[2]}</span>${esc(s.control)}</div>
+      <div><span class="lbl">${cols[3]}</span>${esc(s.outcome)}</div>
+      <div><span class="lbl">${cols[4]}</span>${esc(s.controls)}</div>
+      <div><span class="lbl">${cols[5]}</span>${esc(s.funding)}</div>
+      <div class="sres"><b>Result:</b> ${esc(s.finding)} <span class="pill ${s.statusType === 'stands' ? 'ok' : s.statusType === 'retracted' ? 'bad' : 'warn'}">${esc(s.status)}</span></div>
+    </div>`;
+  }
+  $('matrix').innerHTML = h;
+}
+document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.f;
+  document.querySelectorAll('.chip').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+  drawMatrix();
+}));
+
+/* ================= DEEP DIVES ================= */
+$('dives').innerHTML = DIVES.map(d => `
+  <article class="card dive">
+    <h3>${esc(d.title)}</h3>
+    <div class="meta">${esc(d.meta)}</div>
+    <div>${pills(d.tags)}</div>
+    <dl>
+      <dt>The claim</dt><dd>${esc(d.claim)}</dd>
+      <dt>Problems with the methods</dt><dd><ul>${d.problems.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd>
+      <dt>What happened next</dt><dd><ul>${d.after.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd>
+    </dl>
+    <div class="verdict"><b>Bottom line:</b> ${esc(d.verdict)}</div>
+  </article>`).join('');
+
+/* ================= FUNDING ================= */
+$('fundIntro').textContent = FUNDING.intro;
+$('fund').innerHTML = FUNDING.groups.map(g => `
+  <div class="card">
+    <h3>${esc(g.title)}</h3>
+    <p class="desc">${esc(g.desc)}</p>
+    ${g.items.map(it => `<div class="fchip ${it.camp}"><b>${esc(it.study)}</b><span>${esc(it.who)}</span></div>`).join('')}
+  </div>`).join('');
+
+/* ================= TIMELINE ================= */
+$('tl').innerHTML = TIMELINE.map(e => `<div class="ev ${e.kind}"><span class="yr">${esc(e.year)}</span><b>${esc(e.title)}</b><p>${esc(e.text)}</p></div>`).join('');
+
+/* ================= RISK CHART ================= */
+function drawRisk() {
+  const host = $('riskChart');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 560;
+  const labelW = narrow ? 10 : 270, padR = narrow ? 14 : 40, rowH = narrow ? 46 : 42, top = 6, axisH = 26;
+  const H = top + RISKS.length * rowH + axisH;
+  const lo = 0, hi = 5; // 1 .. 100,000 per million
+  const X = v => labelW + (log10(Math.max(1, v)) - lo) / (hi - lo) * (W - labelW - padR);
+  let g = '';
+  for (let p = lo; p <= hi; p++) {
+    const x = X(Math.pow(10, p));
+    g += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - axisH}" stroke="var(--line)"/>`;
+    g += `<text x="${x}" y="${H - 8}" font-size="11" fill="var(--muted)" text-anchor="middle">${fmt(Math.pow(10, p))}</text>`;
+  }
+  RISKS.forEach((r, i) => {
+    const y = top + i * rowH + rowH / 2;
+    const col = r.src === 'vaccine' ? 'var(--safe)' : 'var(--claim)';
+    if (narrow) {
+      g += `<text x="${labelW}" y="${y - 10}" font-size="12" fill="var(--ink)" font-weight="600">${esc(r.label)} <tspan fill="var(--muted)" font-weight="400">${esc(r.text)}</tspan></text>`;
+    } else {
+      g += `<text x="${labelW - 10}" y="${y - 3}" font-size="13" fill="var(--ink)" text-anchor="end" font-weight="600">${esc(r.label)}</text>`;
+      g += `<text x="${labelW - 10}" y="${y + 12}" font-size="11.5" fill="var(--muted)" text-anchor="end">${esc(r.text)}</text>`;
+    }
+    const x0 = X(r.lo), x1 = X(r.hi);
+    const yb = narrow ? y + 8 : y;
+    if (r.hi > r.lo) g += `<rect x="${x0}" y="${yb - 5}" width="${x1 - x0}" height="10" rx="5" fill="${col}" opacity=".85"/>`;
+    else g += `<circle cx="${x0}" cy="${yb}" r="6" fill="${col}"/>`;
+  });
+  host.innerHTML = svgEl(W, H, g, 'Comparison of MMR side-effect rates and measles complication rates');
+}
+
+/* ================= GUIDE & SOURCES ================= */
+$('guideCards').innerHTML = GUIDE.map(c => `<div class="card"><h3>${esc(c.t)}</h3><p>${esc(c.a)}</p><p>${esc(c.b)}</p></div>`).join('');
+$('srcList').innerHTML = SOURCES.map(s => `<li>${esc(s.t)} <a href="${esc(s.u)}" rel="noopener">${esc(s.u.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a></li>`).join('');
+
+/* ================= LAYOUT ================= */
+function drawAll() { drawSize(); drawForest(); drawRisk(); }
+drawMatrix();
+drawAll();
+let rt = 0;
+new ResizeObserver(() => { cancelAnimationFrame(rt); rt = requestAnimationFrame(drawAll); }).observe(document.querySelector('.wrap'));
+})();
+</script>
+</body>
+</html>
