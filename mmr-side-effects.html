@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MMR Side Effects</title>
+<meta name="description" content="A visual guide to every known side effect of the MMR vaccine: how often each happens, when, how serious it is, how it compares with measles, mumps and rubella, the studies behind each number, and the popular claims about MMR safety.">
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #14171c; --muted: #5b6470; --line: #e2e5ea; --soft: #eef1f5;
+  --accent: #2563eb;
+  --safe: #2f6fd6; --safe-soft: #dbe7fb;
+  --claim: #d9433f; --claim-soft: #fbe0de;
+  --good: #23885a; --warn: #b26a00; --warn-soft: #fbecd2;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
+    --accent: #6ea0ff;
+    --safe: #6ea0ff; --safe-soft: #1b2b45;
+    --claim: #ff6b67; --claim-soft: #3d1d1f;
+    --good: #43c486; --warn: #f0a640; --warn-soft: #3a2a12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1015; --card: #151a21; --ink: #e7eaef; --muted: #9aa4b1; --line: #262d37; --soft: #1c222b;
+  --accent: #6ea0ff;
+  --safe: #6ea0ff; --safe-soft: #1b2b45;
+  --claim: #ff6b67; --claim-soft: #3d1d1f;
+  --good: #43c486; --warn: #f0a640; --warn-soft: #3a2a12;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+nav.top { display: flex; gap: 6px; padding: 14px 0 0; flex-wrap: wrap; }
+nav.top a { font-size: 13px; text-decoration: none; padding: 5px 11px; border-radius: 999px; color: var(--muted); border: 1px solid var(--line); background: var(--card); }
+nav.top a[aria-current="page"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+header { padding: 22px 0 8px; }
+h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.12; margin: 0 0 10px; letter-spacing: -0.02em; max-width: 22ch; }
+.lede { margin: 0; color: var(--muted); max-width: 70ch; font-size: 16px; }
+h2 { font-size: clamp(20px, 2.6vw, 26px); margin: 0 0 6px; letter-spacing: -0.01em; }
+h3 { font-size: 16px; margin: 0 0 6px; }
+section.block { padding: 28px 0 6px; }
+.intro { color: var(--muted); max-width: 75ch; margin: 0 0 14px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat .v { font-size: clamp(22px, 3vw, 30px); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.stat .k { font-size: 13px; color: var(--muted); }
+.v.safe { color: var(--safe); } .v.claim { color: var(--claim); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+svg text { font-family: inherit; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.cap { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.readout { font-size: 13px; color: var(--ink); background: var(--soft); border-radius: 10px; padding: 8px 12px; margin-top: 10px; min-height: 2.6em; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip { font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 999px; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+
+/* study matrix */
+.matrix { display: grid; gap: 10px; }
+.srow { display: grid; grid-template-columns: 210px repeat(5, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); }
+.srow > div { padding: 10px 12px; font-size: 13px; border-left: 1px solid var(--line); }
+.srow > div:first-child { border-left: 0; }
+.srow.head { background: transparent; border: 0; }
+.srow.head > div { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; border: 0; padding-bottom: 0; }
+.sname { font-weight: 700; font-size: 14px !important; }
+.sname small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.srow.safety .sname { box-shadow: inset 4px 0 0 var(--safe); }
+.srow.cited .sname { box-shadow: inset 4px 0 0 var(--claim); }
+.srow > .sres { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); background: var(--soft); font-size: 13.5px; }
+.sres .pill { margin: 0 0 0 6px; }
+.lbl { display: none; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin-bottom: 2px; }
+.pill { display: inline-block; font-size: 11.5px; font-weight: 650; padding: 1px 8px; border-radius: 999px; margin: 0 4px 4px 0; }
+.pill.ok { background: var(--safe-soft); color: var(--safe); }
+.pill.bad { background: var(--claim-soft); color: var(--claim); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+@media (max-width: 860px) {
+  .srow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .srow.head { display: none; }
+  .srow > div { border-left: 0; border-top: 1px solid var(--line); }
+  .srow > div:first-child { grid-column: 1 / -1; border-top: 0; }
+  .lbl { display: block; }
+}
+@media (max-width: 480px) { .srow { grid-template-columns: minmax(0, 1fr); } }
+
+/* deep dives */
+.dives { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 860px) { .dives { grid-template-columns: minmax(0, 1fr); } }
+.dive { border-top: 4px solid var(--claim); }
+.dive .meta { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.dive dl { margin: 0; }
+.dive dt { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; margin-top: 10px; }
+.dive dd { margin: 2px 0 0; font-size: 14px; }
+.dive ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px; }
+.dive li + li { margin-top: 3px; }
+.verdict { margin-top: 12px; padding: 8px 12px; border-radius: 10px; background: var(--claim-soft); font-size: 14px; }
+
+/* funding */
+.fund { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .fund { grid-template-columns: minmax(0, 1fr); } }
+.fund h3 { font-size: 14px; }
+.fund .desc { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.fchip { display: block; font-size: 13px; padding: 6px 10px; border-radius: 8px; margin-bottom: 6px; }
+.fchip.safety { background: var(--safe-soft); }
+.fchip.cited { background: var(--claim-soft); }
+.fchip b { font-weight: 650; }
+.fchip span { display: block; color: var(--muted); font-size: 12px; }
+
+/* timeline */
+.tl { position: relative; padding-left: 26px; }
+.tl::before { content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+.ev { position: relative; padding: 0 0 16px; }
+.ev::before { content: ""; position: absolute; left: -23px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--card); border: 3px solid var(--muted); }
+.ev.safety::before { border-color: var(--safe); }
+.ev.cited::before { border-color: var(--claim); }
+.ev.impact::before { border-color: var(--warn); }
+.ev .yr { font-weight: 750; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.ev p { margin: 2px 0 0; color: var(--muted); font-size: 14px; max-width: 75ch; }
+
+/* bias guide */
+.guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .guide { grid-template-columns: minmax(0, 1fr); } }
+.guide .card p { margin: 0; font-size: 14px; color: var(--muted); }
+.guide .card p + p { margin-top: 8px; color: var(--ink); }
+
+.sources { font-size: 13px; color: var(--muted); padding-left: 20px; }
+.sources li { margin-bottom: 4px; overflow-wrap: anywhere; }
+footer { color: var(--muted); font-size: 13px; padding: 20px 0 40px; }
+/* ---- page-specific ---- */
+.sev-mild { --c: var(--safe); } .sev-mod { --c: var(--warn); } .sev-serious { --c: var(--claim); } .sev-gone { --c: var(--muted); }
+.iom { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .iom { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .iom { grid-template-columns: minmax(0, 1fr); } }
+.iom .card { border-top: 4px solid var(--c); }
+.iom h3 { font-size: 14px; }
+.iom .desc { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.iom ul { margin: 0; padding-left: 18px; font-size: 13.5px; }
+.iom li + li { margin-top: 3px; }
+.contra { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .contra { grid-template-columns: minmax(0, 1fr); } }
+.contra .card { border-left: 4px solid var(--c); }
+.contra .k { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 650; color: var(--c); }
+.contra p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+.claims .dive { border-top-color: var(--warn); }
+.claims .verdict { background: var(--soft); }
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: step; }
+@media (max-width: 860px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+.flow .card { position: relative; }
+.flow .card h3::before { counter-increment: step; content: counter(step); display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--card); font-size: 12px; margin-right: 8px; vertical-align: 1px; }
+.flow p { margin: 0; font-size: 14px; color: var(--muted); }
+.flow p + p { margin-top: 8px; color: var(--ink); }
+.callout { margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: var(--warn-soft); font-size: 14px; }
+.srow { grid-template-columns: 210px repeat(5, minmax(0, 1fr)); }
+.srow.risk .sname { box-shadow: inset 4px 0 0 var(--warn); }
+.srow.nolink .sname { box-shadow: inset 4px 0 0 var(--safe); }
+@media (max-width: 860px) { .srow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 480px) { .srow { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top" aria-label="Site">
+  <a href="./">Herd immunity simulator</a>
+  <a href="mmr-safety.html">MMR and autism</a>
+  <a href="mmr-side-effects.html" aria-current="page">MMR side effects</a>
+</nav>
+
+<header>
+  <h1>What the MMR vaccine can and can't do to you</h1>
+  <p class="lede">Every side effect with good evidence behind it: how often it happens, when it shows up, how serious it is, and how it compares with catching measles, mumps or rubella. Plus the studies behind each number and the claims that circulate online. (Autism has <a href="mmr-safety.html">its own page</a>.)</p>
+  <div class="stats" id="stats"></div>
+</header>
+
+<section class="block" id="ranked">
+  <h2>1. Every known side effect, by how often it happens</h2>
+  <p class="intro">Rate per million doses, on a log scale (each gridline is 10× the one before). Most side effects are common and mild; the serious ones are rare. Bars show a range where sources disagree. Tap a row for details.</p>
+  <div class="card chart">
+    <div class="legend" id="sevLegend"></div>
+    <div id="rankChart"></div>
+    <div class="readout" id="rankReadout">Hover or tap a row for details.</div>
+  </div>
+</section>
+
+<section class="block" id="versus">
+  <h2>2. Same problem, vaccine vs. disease</h2>
+  <p class="intro">Several things MMR can rarely cause are also complications of the diseases it prevents, and much more common after infection. Per million doses (vaccine) or per million cases (disease), log scale.</p>
+  <div class="card chart">
+    <div class="legend">
+      <span><i class="sw" style="background:var(--safe)"></i>After MMR vaccine</span>
+      <span><i class="sw" style="background:var(--claim)"></i>After catching the disease</span>
+    </div>
+    <div id="vsChart"></div>
+    <p class="cap" id="vsCap"></p>
+  </div>
+</section>
+
+<section class="block" id="timing">
+  <h2>3. When side effects show up</h2>
+  <p class="intro">MMR is a live, weakened virus, so most reactions appear one to two weeks after the shot, when the vaccine virus is multiplying, not on the day. Days after vaccination.</p>
+  <div class="card chart">
+    <div id="timeChart"></div>
+    <p class="cap">Measles inclusion body encephalitis, which happens only in people with severely weakened immune systems, has appeared 4–9 months after vaccination (CDC). A dashed edge means the start or end is not sharply defined.</p>
+  </div>
+</section>
+
+<section class="block" id="studies">
+  <h2>4. The studies behind the numbers</h2>
+  <p class="intro">These studies found real risks (seizures, low platelets, joint pain, meningitis from one mumps strain) as well as ruling others out. That matters: the same methods that clear MMR of a harm are the ones that caught the harms it does have. Size of each study, log scale:</p>
+  <div class="card chart">
+    <div class="legend">
+      <span><i class="sw" style="background:var(--warn)"></i>Found a real (rare) risk</span>
+      <span><i class="sw" style="background:var(--safe)"></i>Found no link</span>
+    </div>
+    <div id="sizeChart"></div>
+    <div class="readout" id="sizeReadout">Hover or tap a bar for details.</div>
+  </div>
+  <div class="chips" role="group" aria-label="Filter studies" style="margin-top:16px">
+    <button class="chip" data-f="all" aria-pressed="true">All studies</button>
+    <button class="chip" data-f="risk">Found a real risk</button>
+    <button class="chip" data-f="nolink">Found no link</button>
+  </div>
+  <div class="matrix" id="matrix"></div>
+  <p class="cap" id="fundNote"></p>
+</section>
+
+<section class="block" id="iom">
+  <h2>5. What an independent review concluded</h2>
+  <p class="intro" id="iomIntro"></p>
+  <div class="iom" id="iomGrid"></div>
+</section>
+
+<section class="block" id="who">
+  <h2>6. Who should not get MMR, or should wait</h2>
+  <p class="intro">Most serious harms happen in people who shouldn't have had a live vaccine in the first place. These rules come from CDC's vaccine advisory committee (ACIP); talk to a doctor about your own case.</p>
+  <div class="contra" id="contra"></div>
+</section>
+
+<section class="block" id="monitor">
+  <h2>7. How side effects get found</h2>
+  <p class="intro">Vaccine safety monitoring has several layers. Each one catches different things, and confusing them is behind many of the claims in the next section.</p>
+  <div class="flow" id="flow"></div>
+  <div class="callout" id="flowCallout"></div>
+</section>
+
+<section class="block" id="claims">
+  <h2>8. Common claims about MMR safety, checked</h2>
+  <p class="intro">Claims that circulate widely, where they come from, and what the underlying data show.</p>
+  <div class="dives claims" id="claimCards"></div>
+</section>
+
+<section class="block" id="sources">
+  <h2>Sources</h2>
+  <ol class="sources" id="srcList"></ol>
+</section>
+
+<footer>
+  <p>Numbers were checked against the original papers and CDC, WHO, Cochrane and National Academies documents listed above. Where sources disagree, the page shows a range. This page is educational and not medical advice; talk to a doctor about your own situation.</p>
+</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const fmt = n => n.toLocaleString('en-US');
+const log10 = Math.log10;
+
+/* ================= DATA ================= */
+const STATS = [{"v": "138 studies", "k": "23.5 million people, in the Cochrane review of MMR effectiveness and harms", "cls": "safe"}, {"v": "1 in 40,000", "k": "doses causes temporary low platelets (ITP). Rubella infection: about 1 in 3,000", "cls": ""}, {"v": "0", "k": "babies with rubella birth defects among 1,980 born to susceptible mothers vaccinated in pregnancy", "cls": "safe"}, {"v": "1–3 in 1,000", "k": "children who catch measles die. No death from MMR is documented in a healthy person", "cls": "claim"}];
+const EVENTS = [{"label": "Joint pain, adult women", "lo": 100000, "hi": 250000, "sev": "mild", "text": "10–25% of women not already immune", "detail": "From the rubella part of the vaccine. Starts 1–3 weeks after the shot and usually lasts a few days (up to 3 weeks). Rare in children. A placebo-controlled trial found acute joint symptoms in 30% of vaccinated vs 20% of placebo women. Rubella infection itself causes joint pain or arthritis in up to 70% of adult women."}, {"label": "Fever of 103°F (39.4°C) or more", "lo": 50000, "hi": 150000, "sev": "mild", "text": "5–15% of doses", "detail": "Starts 7–12 days after vaccination and lasts 1–2 days (CDC Pink Book). Much less common after the second dose, because most children are already immune."}, {"label": "Mild rash", "lo": 20000, "hi": 50000, "sev": "mild", "text": "2–5% of doses", "detail": "Appears 7–10 days after vaccination and lasts about 2 days (CDC, WHO). Not contagious."}, {"label": "Fever-related (febrile) seizure", "lo": 250, "hi": 870, "sev": "mod", "text": "1 in 1,150–4,000 doses", "detail": "CDC: about 1 in 3,000–4,000 doses; the Cochrane review puts it at 1 in 1,150–1,700. Happens 6–14 days after vaccination, when the fever peaks. Frightening but not linked to long-term harm: a study of 537,171 Danish children found no increase in later epilepsy. The risk is lower when the first dose is given on time at 12–15 months."}, {"label": "Extra seizures, MMRV combo shot", "lo": 385, "hi": 435, "sev": "mod", "text": "1 extra per 2,300–2,600 first doses", "detail": "Giving the combined MMRV shot as a first dose at 12–23 months roughly doubles the seizure risk compared with separate MMR and chickenpox shots on the same day. For that reason CDC recommends separate shots for the first dose unless the parent prefers MMRV. No extra risk was seen for the second dose at 4–6 years."}, {"label": "Meningitis, old Urabe mumps strain", "lo": 90, "hi": 1000, "sev": "gone", "text": "1 in 1,000–11,000 doses; withdrawn", "detail": "Older MMR brands using the Urabe mumps strain caused mild, short-lived meningitis about 1 in 11,000 doses in the UK, more in Japan. WHO reports the UK stopped using them in 1992; today's US MMR uses the Jeryl Lynn strain, which has not been shown to cause it. Wild mumps caused meningitis about 4 times as often as Urabe vaccine."}, {"label": "Low platelets (ITP)", "lo": 25, "hi": 42, "sev": "mod", "text": "1 in 24,000–40,000 doses", "detail": "Immune thrombocytopenia: easy bruising or tiny red spots, within 6 weeks of vaccination. A review of 12 studies found 93% of cases resolved within 6 months and severe bleeding was rare. Rubella infection causes bleeding problems in about 1 in 3,000 cases."}, {"label": "Severe allergy (anaphylaxis)", "lo": 1.8, "hi": 14.4, "sev": "serious", "text": "1.8–14.4 per million doses", "detail": "Starts within minutes to hours, which is why clinics watch people briefly after vaccination. Usually caused by gelatin or the antibiotic neomycin, not egg. Treatable with epinephrine; no confirmed MMR anaphylaxis death was found."}, {"label": "Brain inflammation (encephalitis)", "lo": null, "hi": null, "sev": "serious", "text": "not shown to be caused by MMR", "offscale": "Under 1 per million, if it happens at all", "detail": "Studies of over a million children found no link (Cochrane). The National Academies said the evidence is too thin to accept or reject a link. WHO estimates any risk is under 1 per million doses, about 1,000 times lower than the risk from measles (1 in 1,000 cases)."}, {"label": "Vaccine-virus brain infection (MIBE)", "lo": null, "hi": null, "sev": "serious", "text": "severe immune deficiency only", "offscale": "A handful of case reports only", "detail": "Measles inclusion body encephalitis can be fatal. It has only been reported in people whose immune systems were severely weakened, often by a condition not yet diagnosed. This is why MMR is not given to people with severe immune deficiency (see section 6)."}, {"label": "Death in a healthy person", "lo": null, "hi": null, "sev": "serious", "text": "none documented", "offscale": "No documented case", "detail": "CDC and FDA physicians reviewed death reports filed after MMR and found no pattern suggesting the vaccine caused them; many involved serious pre-existing conditions. Documented vaccine-caused deaths are in severely immunocompromised people only."}];
+const PAIRS = [{"label": "Death", "vac": {"zero": "None documented in healthy people"}, "dis": {"lo": 1000, "hi": 3000, "text": "1–3 in 1,000 children", "which": "measles"}}, {"label": "Brain inflammation", "vac": {"zero": "Not shown; under 1 per million if any (WHO)"}, "dis": {"lo": 1000, "hi": 1000, "text": "about 1 in 1,000", "which": "measles"}}, {"label": "Birth defects (pregnancy)", "vac": {"zero": "0 cases in 1,980 babies (max. risk 0.2%)"}, "dis": {"lo": 850000, "hi": 900000, "text": "85–90% of early-pregnancy infections", "which": "rubella, first trimester"}}, {"label": "Meningitis", "vac": {"zero": "Not shown with today's Jeryl Lynn strain"}, "dis": {"lo": 100000, "hi": 100000, "text": "up to 1 in 10 cases", "which": "mumps, unvaccinated"}}, {"label": "Low platelets / bleeding", "vac": {"lo": 25, "hi": 42, "text": "1 in 24,000–40,000 doses"}, "dis": {"lo": 333, "hi": 333, "text": "about 1 in 3,000 cases", "which": "rubella"}}, {"label": "Joint pain, adult women", "vac": {"lo": 100000, "hi": 250000, "text": "10–25%"}, "dis": {"lo": 700000, "hi": 700000, "text": "up to 70%", "which": "rubella"}}];
+const VS_CAP = "Vaccine rates are per million doses; disease rates are per million cases. Before vaccination nearly every child caught measles. Sources: CDC measles, mumps and rubella clinical pages and Pink Book; WHO rubella fact sheet and MMR information sheet; CDC/PAHO pregnancy follow-up (Castillo-Solórzano 2011). The 85–90% figure is WHO's estimate for infection early in pregnancy reaching or harming the baby.";
+const TIMING = [{"label": "Anaphylaxis", "d0": 0, "d1": 0.4, "sev": "serious", "text": "minutes to hours"}, {"label": "Fever", "d0": 7, "d1": 12, "sev": "mild", "text": "days 7–12, lasts 1–2 days"}, {"label": "Rash", "d0": 7, "d1": 10, "sev": "mild", "text": "days 7–10"}, {"label": "Febrile seizure", "d0": 6, "d1": 14, "p0": 7, "p1": 10, "sev": "mod", "text": "days 6–14, most on days 7–10"}, {"label": "Joint pain (women)", "d0": 7, "d1": 21, "sev": "mild", "soft": true, "text": "1–3 weeks after"}, {"label": "Low platelets (ITP)", "d0": 0, "d1": 42, "sev": "mod", "soft": true, "text": "within 6 weeks"}, {"label": "Meningitis (old Urabe strain)", "d0": 15, "d1": 35, "sev": "gone", "text": "days 15–35"}];
+const STUDIES = [{"id": "vest", "short": "Vestergaard 2004", "name": "Vestergaard et al. 2004", "where": "JAMA · Denmark", "kind": "risk", "topic": "Febrile seizures", "n": 537171, "nShort": "537,171", "design": "Nationwide cohort of every child born in Denmark 1991–1998", "nText": "537,171 children (82% got MMR); 17,986 had a febrile seizure", "control": "Children not (yet) vaccinated at the same ages", "outcome": "Hospital-recorded seizure and epilepsy diagnoses from national registers", "controls": "Compared risk by time since vaccination; looked separately at children with a sibling or personal history of seizures; followed children for later epilepsy", "funding": "Not confirmed from full text. Danish academic authors; one listed a CDC affiliation", "finding": "Seizure risk was 2.75× higher in the 2 weeks after MMR (about 1.6 extra per 1,000 children at 15–17 months). No increase in later epilepsy (RR 0.70, 0.33–1.50)."}, {"id": "klein", "short": "Klein 2010", "name": "Klein et al. 2010", "where": "Pediatrics · USA (Vaccine Safety Datalink)", "kind": "risk", "topic": "MMRV seizures", "n": 459461, "nShort": "459,461", "design": "Cohort study in US health plans, 2000–2008, children 12–23 months", "nText": "83,107 MMRV recipients vs 376,354 who got separate MMR + chickenpox shots", "control": "Children who got separate MMR and chickenpox vaccines on the same day", "outcome": "Seizure diagnoses in health-plan medical records, confirmed by chart review", "controls": "Also compared each child with themselves at other times (self-controlled analysis)", "funding": "Not confirmed from full text. Run in CDC's Vaccine Safety Datalink, a CDC partnership with health plans", "finding": "MMRV roughly doubled seizure risk on days 7–10 (RR 1.98, 1.43–2.73): 1 extra seizure per 2,300 doses. CDC changed its recommendation to separate shots for the first dose."}, {"id": "rowhani", "short": "Rowhani-Rahbar 2013", "name": "Rowhani-Rahbar et al. 2013", "where": "JAMA Pediatrics · USA (Vaccine Safety Datalink)", "kind": "risk", "topic": "Seizures by age", "n": 840348, "nShort": "840,348", "design": "Cohort of children 12–23 months who received a measles-containing vaccine", "nText": "840,348 children", "control": "Children vaccinated at different ages (12–15 vs 16–23 months)", "outcome": "Seizure diagnoses in health-plan records", "controls": "Analyzed separately by age at vaccination and vaccine type", "funding": "Not confirmed from full text. Run in CDC's Vaccine Safety Datalink", "finding": "Extra seizures: 4.0 per 10,000 doses at 12–15 months vs 9.5 per 10,000 at 16–23 months. Delaying the shot raises, not lowers, the seizure risk."}, {"id": "france", "short": "France 2008", "name": "France et al. 2008", "where": "Pediatrics · USA (Vaccine Safety Datalink)", "kind": "risk", "topic": "Low platelets (ITP)", "n": 1036689, "nShort": "1,036,689", "design": "Cohort in US health plans (Vaccine Safety Datalink)", "nText": "1,036,689 children, 1,107,814 doses; 259 confirmed ITP cases", "control": "Each child's 6 weeks after vaccination vs their unexposed time", "outcome": "ITP diagnoses confirmed by medical-chart review", "controls": "Self-comparison removes fixed differences between children; analyzed by age and vaccine", "funding": "Not confirmed from full text. Run in CDC's Vaccine Safety Datalink", "finding": "ITP was about 7× more likely in the 6 weeks after MMR at 12–15 months, about 1 in 40,000 doses. Cases lasted about as long as other childhood ITP (median 11 vs 10 days)."}, {"id": "tingle", "short": "Tingle 1997", "name": "Tingle et al. 1997", "where": "The Lancet · British Columbia, Canada", "kind": "risk", "topic": "Joint pain in women", "n": 546, "nShort": "546", "design": "Randomized, double-blind, placebo-controlled trial", "nText": "546 non-immune women after childbirth: 270 vaccine, 276 saline placebo", "control": "Saline placebo injection, assigned at random", "outcome": "Joint symptoms recorded during follow-up", "controls": "Randomization and blinding: neither the women nor assessors knew who got vaccine", "funding": "Not confirmed from full text", "finding": "Acute joint symptoms in 30% vaccine vs 20% placebo (OR 1.73). Chronic or recurring symptoms slightly more common (OR 1.58, 1.01–2.45), a borderline result."}, {"id": "ray", "short": "Ray 1997", "name": "Ray et al. 1997", "where": "JAMA · Northern California (Kaiser)", "kind": "nolink", "topic": "Chronic arthritis in women", "n": 4316, "nShort": "4,316", "design": "Retrospective cohort in one health plan, women 15–59", "nText": "971 vaccinated women vs 924 unvaccinated non-immune and 2,421 immune women", "control": "Two control groups: unvaccinated non-immune women, and women already immune", "outcome": "Medical records reviewed 2 years before and after; possible cases judged by a rheumatologist", "controls": "The rheumatologist was blinded to vaccination and immune status; controls matched on test date", "funding": "Not confirmed from full text. Vaccine Safety Datalink team", "finding": "No increase in chronic joint or nerve conditions. Only exception: carpal tunnel syndrome in women 30+ (2.9% vs 1.4%)."}, {"id": "miller93", "short": "Miller 1993", "name": "Miller et al. 1993", "where": "The Lancet · 13 UK health districts", "kind": "risk", "topic": "Meningitis, Urabe strain", "n": null, "nShort": "", "design": "Active search of lab and hospital records for meningitis, linked to vaccination records", "nText": "All aseptic meningitis cases in 13 districts; 28 linked to vaccine", "control": "Compared onset timing (15–35 days after shot) and the two mumps strains on the market", "outcome": "Meningitis confirmed by spinal-fluid tests or hospital diagnosis", "controls": "Two independent ways of finding cases; Jeryl Lynn strain (14% market share) as a natural comparison", "funding": "Not confirmed. Authors at the UK Public Health Laboratory Service", "finding": "About 1 in 11,000 doses of Urabe-strain MMR caused meningitis; no cases after Jeryl Lynn. Wild mumps carried about 4× the risk. The UK switched to Jeryl Lynn only."}, {"id": "black", "short": "Black 1997", "name": "Black et al. 1997", "where": "Pediatr Infect Dis J · USA (Vaccine Safety Datalink)", "kind": "nolink", "topic": "Meningitis, Jeryl Lynn strain", "n": 500000, "nShort": "~500,000", "design": "10-year matched case-control study in 4 health plans", "nText": "About 500,000 children under 7 under surveillance", "control": "2 controls per case, matched on age, sex and health plan", "outcome": "Hospitalized meningitis cases validated against a standard definition", "controls": "Followed up an automated screening signal with validated cases", "funding": "Not confirmed. Vaccine Safety Datalink team", "finding": "An early automated screen suggested a possible signal; checking validated cases found no increased risk after Jeryl Lynn MMR (odds ratio below 1 in all analyses)."}, {"id": "patja00", "short": "Patja 2000", "name": "Patja et al. 2000", "where": "Pediatr Infect Dis J · Finland", "kind": "risk", "topic": "All serious events", "n": 1800000, "nShort": "1.8M people", "design": "14-year nationwide surveillance of every hospital and health center, 1982–1996", "nText": "1.8 million people vaccinated, almost 3 million doses", "control": "None (surveillance); each case checked for other causes", "outcome": "Reported serious events with clinical charts reviewed and blood tested for other infections", "controls": "Investigators looked for other explanations (45% of events were probably caused by something else)", "funding": "Not confirmed. Lead authors at Helsinki University Central Hospital", "finding": "173 possible serious reactions were reported (including 1 death); after review, serious events possibly caused by MMR occurred 3.2 per 100,000 doses, \"greatly outweighed by the risks\" of the diseases."}, {"id": "patja01", "short": "Patja 2001", "name": "Patja et al. 2001", "where": "J Pediatrics · Finland", "kind": "nolink", "topic": "Guillain-Barré syndrome", "n": 630000, "nShort": "~630,000", "design": "Nationwide hospital-register linkage", "nText": "About 630,000 people given 900,000 doses; 189 Guillain-Barré patients", "control": "Background rate of Guillain-Barré in the population", "outcome": "Hospital diagnoses of Guillain-Barré syndrome", "controls": "Checked for clustering in the weeks after vaccination and relapse after a second dose", "funding": "Not confirmed", "finding": "No rise over background rate. No case began within 6 weeks of vaccination; revaccination caused no relapses."}, {"id": "hviid04", "short": "Hviid 2004", "name": "Hviid et al. 2004", "where": "NEJM · Denmark", "kind": "nolink", "topic": "Type 1 diabetes", "n": null, "nShort": "", "design": "Nationwide cohort of every child born in Denmark 1990–2000", "nText": "681 diabetes cases over 4.7 million person-years", "control": "Unvaccinated Danish children", "outcome": "Type 1 diabetes diagnoses from national registers", "controls": "Analyzed children with a diabetic sibling separately; tested the claim that cases cluster 2–4 years after vaccination", "funding": "Not confirmed. Authors at Statens Serum Institut, the Danish state infectious-disease agency", "finding": "No link: MMR RR 1.14 (0.90–1.45). No link in genetically at-risk children and no clustering after vaccination."}, {"id": "davis", "short": "Davis 2001", "name": "Davis et al. 2001", "where": "Arch Pediatr Adolesc Med · USA (Vaccine Safety Datalink)", "kind": "nolink", "topic": "Crohn's / IBD", "n": null, "nShort": "", "design": "Case-control study in 4 health plans", "nText": "155 people with inflammatory bowel disease, up to 5 matched controls each", "control": "Controls matched on sex, health plan and birth year", "outcome": "IBD diagnosis codes in health-plan records", "controls": "Matching; analyzed age at vaccination and the period right after vaccination", "funding": "Not confirmed. Vaccine Safety Datalink team", "finding": "No link: Crohn's OR 0.4 (0.08–2.0), IBD OR 0.59 (0.21–1.68). Small study: Cochrane rates the overall IBD evidence as too limited to be certain."}, {"id": "hviid08", "short": "Hviid 2008", "name": "Hviid & Melbye 2008", "where": "Am J Epidemiology · Denmark", "kind": "nolink", "topic": "Asthma", "n": 871234, "nShort": "871,234", "design": "Nationwide cohort", "nText": "871,234 Danish children", "control": "Unvaccinated Danish children", "outcome": "Asthma hospital admissions and anti-asthma prescriptions from national registers", "controls": "Two independent asthma measures", "funding": "Not confirmed. Statens Serum Institut authors", "finding": "Vaccinated children had fewer asthma hospitalizations (RR 0.75) and used slightly less asthma medication (RR 0.92)."}, {"id": "castillo", "short": "Castillo-Solórzano 2011", "name": "Castillo-Solórzano et al. 2011", "where": "J Infectious Diseases · 6 Latin American countries", "kind": "nolink", "topic": "Vaccination in pregnancy", "n": 30139, "nShort": "30,139", "design": "Follow-up of women vaccinated during mass campaigns, 2001–2008", "nText": "30,139 women who were or became pregnant; 2,894 not immune, 1,980 live births", "control": "None; expected birth-defect risk if the vaccine virus behaved like wild rubella", "outcome": "Babies tested for rubella antibodies and examined for congenital rubella syndrome", "controls": "Lab-confirmed immune status of mothers; testing of infants", "funding": "Not confirmed. Pan American Health Organization and CDC authors", "finding": "70 babies (3.5%) showed signs of exposure to the vaccine virus, but none had congenital rubella syndrome. Maximum theoretical risk: 0.2%."}, {"id": "james", "short": "James 1995", "name": "James et al. 1995", "where": "NEJM · USA", "kind": "nolink", "topic": "Egg allergy", "n": 54, "nShort": "54", "design": "Prospective case series", "nText": "54 egg-allergic children, 26 with past egg anaphylaxis", "control": "None", "outcome": "Observed for immediate and delayed reactions after MMR", "controls": "Included the highest-risk children: those with past egg anaphylaxis", "funding": "Not confirmed", "finding": "No child had an immediate or delayed reaction. CDC now says egg-allergic people can get MMR with no skin testing or special steps."}, {"id": "cochrane", "short": "Cochrane 2020", "name": "Di Pietrantonj et al. (Cochrane) 2020", "where": "Cochrane Database of Systematic Reviews", "kind": "risk", "topic": "All harms (review)", "n": 23480668, "nShort": "23.5M (pooled)", "design": "Systematic review of 138 studies (87 on harms, 13.2 million children)", "nText": "23,480,668 participants", "control": "Includes randomized trials, cohort, case-control and self-controlled studies", "outcome": "As reported by each study; certainty graded with GRADE", "controls": "Independent reviewers rate each study's risk of bias", "funding": "Cochrane; all authors declared no known conflicts", "finding": "Confirmed febrile seizures (1 in 1,150–1,700 doses) and ITP (1 in 40,000), and meningitis with Urabe/Leningrad-Zagreb strains only. No link to encephalitis, autism, diabetes, asthma, eczema, leukemia, MS and others. IBD evidence insufficient."}];
+const FUND_NOTE = "About funding: most of these papers' funding statements are behind journal paywalls, so we list what we could confirm and say \"not confirmed\" otherwise. Many US studies ran in the Vaccine Safety Datalink, a CDC partnership with health plans that links vaccination and medical records. Danish studies come from Statens Serum Institut, the state infectious-disease agency. Government involvement is a reasonable thing to question; it helps to notice that these same systems are the ones that found and published MMR's real risks, and that CDC changed its own recommendation on MMRV because of them.";
+const IOM = {"intro": "In 2011 the Institute of Medicine (now the National Academies), an independent body, reviewed every proposed MMR harm and graded the evidence on causation. It found real but rare harms, rejected others, and was candid that for many conditions the evidence is <b>too thin to decide either way</b>. \"Inadequate\" is not a finding of harm: it means studies are too few or too small, usually because the condition is extremely rare. <a href=\"https://www.nationalacademies.org/read/13164/chapter/6\">Report chapter</a>.", "groups": [{"title": "Convincingly supports a link", "sev": "serious", "desc": "Strong evidence MMR can cause it.", "items": ["Febrile seizures", "Anaphylaxis", "Measles inclusion body encephalitis, only in people with severe immune deficiency"]}, {"title": "Favors a link", "sev": "mod", "desc": "Evidence leans toward a causal link.", "items": ["Temporary joint pain in women", "Temporary joint pain in children"]}, {"title": "Not enough evidence to decide", "sev": "gone", "desc": "Too few or too small studies to accept or reject.", "items": ["Encephalitis and encephalopathy", "Afebrile seizures, meningitis, ataxia", "Guillain-Barré, ADEM, transverse myelitis", "Multiple sclerosis, optic neuritis", "Chronic arthritis in women", "Hearing loss, hepatitis, fibromyalgia"]}, {"title": "Favors no link", "sev": "mild", "desc": "Evidence leans against a causal link.", "items": ["Autism", "Type 1 diabetes"]}]};
+const CONTRA = [{"kind": "no", "t": "Severe allergy to a previous dose or an ingredient", "text": "Including gelatin or the antibiotic neomycin. This is what causes most MMR anaphylaxis."}, {"kind": "no", "t": "Pregnancy", "text": "As a precaution, because it is a live vaccine. Avoid pregnancy for 4 weeks after the shot. If it happens by accident, it is not a reason to end the pregnancy: no baby has been found with vaccine-caused rubella defects."}, {"kind": "no", "t": "Severely weakened immune system", "text": "For example leukemia treatment, high-dose steroids (2 mg/kg or 20 mg/day prednisone for 14+ days), or advanced HIV. People with HIV and adequate CD4 counts (15%+ for 6 months) should be vaccinated, because measles is far more dangerous to them."}, {"kind": "wait", "t": "Recent blood products or antibodies", "text": "These can stop the vaccine working, so the shot may need to wait several months."}, {"kind": "wait", "t": "History of seizures, or ITP", "text": "A personal or family history of seizures is a reason to choose separate MMR and chickenpox shots instead of combined MMRV. A past episode of low platelets is a reason to discuss timing with a doctor."}, {"kind": "ok", "t": "Egg allergy", "text": "Not a reason to skip MMR. Over 99% of children with proven egg allergy get it without a severe reaction, with no skin testing or special steps needed (CDC)."}];
+const FLOW = {"steps": [{"t": "Before licensing: trials", "a": "Randomized trials compare vaccine with placebo or another vaccine in thousands of people.", "b": "Good for common effects (fever, rash). Too small to see 1-in-40,000 events."}, {"t": "Anyone can report: VAERS", "a": "The Vaccine Adverse Event Reporting System accepts reports from anyone of anything that happened after a vaccine. It has no record of how many people got the vaccine or how often the event happens anyway.", "b": "An early-warning signal, not proof. A report means \"this happened after,\" not \"this was caused by.\""}, {"t": "Checking signals: linked records", "a": "Systems such as CDC's Vaccine Safety Datalink (millions of health-plan members) and national registries (Denmark, Finland) link vaccination dates to diagnoses for everyone, vaccinated or not.", "b": "They can compare rates and test whether an event happens more after vaccination than at other times."}, {"t": "Independent reviews", "a": "Bodies such as Cochrane and the National Academies weigh all studies together and grade their quality.", "b": "They decide whether evidence supports, rejects, or can't yet settle a link."}], "callout": "<b>The system has caught real problems.</b> Linked-record studies found the extra seizure risk from combined MMRV, and CDC changed its recommendation. UK active surveillance found the Urabe mumps strain caused meningitis, and the UK stopped using it. A signal for meningitis with Jeryl Lynn MMR was checked against verified cases and did not hold up. That is the process working in both directions."};
+const CLAIMS = [{"title": "\"VAERS shows hundreds of deaths after MMR\"", "tags": [["warn", "No denominator"], ["warn", "Not peer-reviewed"]], "claim": "Death reports in the federal VAERS database show MMR kills more people than measles. A 2026 preprint from the McCullough Foundation counted 536 death reports after MMR or MMRV worldwide (299 in the US) and compared them with 7 recent US measles deaths.", "data": ["VAERS accepts reports from anyone about anything that happened after a vaccine. Its own guide says a report does not establish that the vaccine caused the event.", "CDC reviewed all 2,149 US VAERS death reports for any vaccine from 1997–2013, using records and autopsies. Causes matched common causes of death; in children the top cause was sudden infant death syndrome (44%).", "Adults given MMR, 2003–2013: 3,175 VAERS reports, 7 deaths, and no new or unexpected safety concerns (CDC/FDA review).", "Finland's 14-year active surveillance of about 3 million doses found serious events possibly caused by MMR at 3.2 per 100,000 doses; 45% of reported events had another cause.", "Measles in the US: 3 deaths among 2,289 cases in 2025; 6 provisional deaths among 5,412 cases in 2026 as of November (CDC)."], "problems": ["Counts are not rates: about 147 million MMR doses were distributed in the US in 2006–2024 alone.", "By the preprint's own figures, 74.6% of the deaths followed visits where other vaccines were given too, and sudden unexplained death was the most common category. Such deaths also happen in unvaccinated children, so counts alone can't show a cause.", "Measles deaths are low now because most people are vaccinated. The fair comparison is 1–3 deaths per 1,000 infected children."], "verdict": "VAERS is a smoke detector, not a fire investigation. When death reports were investigated, no pattern pointed to MMR causing death in healthy people."}, {"title": "\"The government has paid billions for vaccine injuries\"", "tags": [["warn", "No denominator"]], "claim": "The National Vaccine Injury Compensation Program has paid billions of dollars, which proves vaccines like MMR are widely harmful.", "data": ["The program has paid about $5.5 billion since 1988, for all covered vaccines combined (HRSA).", "HRSA: roughly 1 person compensated for every 1 million vaccine doses distributed.", "MMR, 2006–2024: about 147 million doses distributed and 170 claims compensated, about 1.2 per million doses (HRSA monthly report).", "HRSA says about 60% of awards are negotiated settlements in which HHS has not concluded that the vaccine caused the injury."], "problems": ["A dollar total over 38 years and billions of doses, with no denominator.", "The program is no-fault by design: for listed injuries (such as anaphylaxis within 4 hours, or low platelets 7–30 days after MMR) causation is presumed so families don't have to prove it.", "Totals include settlements and attorneys' fees, which can be paid even when claims lose."], "verdict": "The program exists so families can be paid for rare injuries without a lawsuit. Its own numbers work out to about 1 compensated MMR claim per million doses."}, {"title": "\"Vaccinated people shed measles and infect others\"", "tags": [["ok", "Checked directly"]], "claim": "People recently given MMR shed live virus and can give measles to others, so the unvaccinated should avoid them.", "data": ["CDC's advisory committee: there are no reports of measles or mumps vaccine virus spreading from a vaccinated person to someone else.", "A 2016 systematic review of 773 articles found no evidence of person-to-person spread of measles vaccine virus among thousands of genotyped samples.", "Vaccine-strain virus can sometimes be detected in a recent vaccinee's throat or urine. Detecting genetic material is not the same as infecting someone.", "The one real exception: rubella vaccine virus can pass through breast milk when a mother is vaccinated after giving birth. In reported cases no baby had severe illness; one had mild rubella-like symptoms (FDA label).", "CDC recommends that household contacts of people with weak immune systems get MMR, which it would not do if shedding were a risk."], "problems": ["Confuses detection with transmission.", "Confuses MMR with the chickenpox vaccine, which can very rarely spread from someone who develops a rash (13 cases from 11 people documented through 2018)."], "verdict": "There is no documented case of measles or mumps vaccine virus infecting another person."}, {"title": "\"The package insert lists encephalitis and death\"", "tags": [["warn", "Misread label"]], "claim": "Merck's own label for M-M-R II admits it causes encephalitis, Guillain-Barré, seizures and death.", "data": ["The label lists reactions \"identified during clinical trials or reported during post-approval use,\" with no frequency given for the post-approval list.", "FDA rules require listing an event when there is \"some basis to believe\" it could be caused by the product. That is a deliberately low bar, not proof.", "Death appears in the contraindications: deaths from vaccine virus were reported in immunocompromised people vaccinated by mistake. That is why they should not receive it (section 6)."], "problems": ["Treats a cautious list of possible reactions as proven effects, and ignores how often they happen.", "For encephalitis, controlled studies of over a million children found no link (section 1)."], "verdict": "The label is written to be cautious. For how often things actually happen, look at controlled studies (section 4)."}, {"title": "\"MMR contains aborted fetal cells\"", "tags": [["ok", "Real origin"], ["warn", "Misleading wording"]], "claim": "MMR \"contains a lot of aborted fetus debris and DNA particles\" (HHS Secretary Kennedy, April 2025, as reported by PolitiFact).", "data": ["The rubella part is grown in WI-38 cells, a cell line started in 1962 from lung tissue of one fetus aborted at about 3 months. The measles and mumps parts are grown in chick embryo cells.", "WI-38 has been grown in laboratories since then; no new fetal tissue is used.", "The label does not list human DNA as an ingredient. The DNA figures activists cite were measured in a standalone rubella vaccine, not MMR. We could not confirm residual DNA amounts in MMR from a primary source.", "The Catholic Church's Pontifical Academy for Life (2005) and its doctrinal office (2020) said such vaccines may be used when no alternative exists, describing this as remote cooperation."], "problems": ["\"Debris\" suggests fetal tissue in each dose. The cells are a 60-year-old laboratory line, and the vaccine virus is separated from them."], "verdict": "The cell-line origin is real and a sincere ethical concern for some people. It is not evidence of a safety problem, and major religious authorities accept the vaccine."}, {"title": "\"Merck whistleblowers proved the vaccine is a fraud\"", "tags": [["ok", "Decided in court"]], "claim": "Two Merck scientists exposed fraud in the MMR vaccine (United States ex rel. Krahling v. Merck).", "data": ["The 2010 lawsuit by two former Merck virologists alleged Merck overstated how well the mumps component worked and how long it kept its strength. It was about effectiveness, not safety.", "2023: a federal court ruled for Merck. Even assuming the statements were false, none mattered to CDC's purchasing decisions.", "2024: the appeals court (Third Circuit) agreed, noting CDC ran its own effectiveness studies and kept buying the vaccine.", "A related antitrust case also lost; the Supreme Court declined to hear it in October 2025."], "problems": ["Allegations in a complaint are not findings.", "Mumps immunity fading over time is openly published, and vaccinated men who still catch mumps get testicle inflammation far less often (about 6% vs 30%, CDC)."], "verdict": "No court found fraud, and the case never concerned whether MMR is safe."}, {"title": "\"Vaccinated children are sicker than unvaccinated ones\"", "tags": [["bad", "One retracted"], ["warn", "Unadjusted"]], "claim": "Studies comparing vaccinated and unvaccinated children show the vaccinated have more asthma, ear infections and developmental problems.", "data": ["Hooker & Miller 2020: 2,047 children from 3 practices; unadjusted odds ratios (asthma 4.49, developmental delay 2.18). The authors note they could not adjust for other factors. Hooker is a Children's Health Defense trustee; Miller directs the Thinktwice Global Vaccine Institute. The journal issued a correction in 2026; it is not retracted.", "Lyons-Weiler & Thomas 2020: one practice, owned by an author who earns royalties from a book promoting an alternative vaccine schedule. Retracted in 2021 because the conclusions were not supported; the authors disagreed.", "\"Henry Ford study\" (2025): an unpublished draft (18,468 children) entered into the record at a Senate hearing. Henry Ford Health reportedly said it did not meet its standards.", "By contrast, a registry study of all 871,234 Danish children found MMR-vaccinated children had fewer asthma hospitalizations (RR 0.75)."], "problems": ["Families who vaccinate visit doctors more often, so more conditions get diagnosed (healthcare-seeking bias).", "No adjustment for differences between families.", "Practices were recruited through advocacy networks, with authors who had financial or organizational stakes in the result."], "verdict": "Small, unadjusted, advocacy-linked studies versus whole-population registries. The large, careful studies don't find vaccinated children sicker."}, {"title": "\"Measles is mild, and catching it builds stronger immunity\"", "tags": [["ok", "Measured directly"]], "claim": "Measles is a harmless childhood illness, and natural infection trains the immune system better than a vaccine.", "data": ["CDC: about 1 in 5 unvaccinated US patients is hospitalized; 1 in 1,000 gets encephalitis; 1–3 per 1,000 children die; SSPE, which is always fatal, appears 7–10 years later.", "Mina et al. 2019 (Science) tested 77 unvaccinated children before and after measles. Measles wiped out 11–73% of their existing antibodies to other germs (median 33% after mild cases, 40% after severe). This did not happen in 33 MMR-vaccinated children.", "Mina et al. 2015 (Science): in England and Wales, the US and Denmark, deaths from other infections rose and fell with measles for 2–3 years afterwards.", "Petrova et al. 2019 found measles deletes memory immune cells, and in ferrets a related virus wiped out flu immunity from vaccination."], "problems": ["Ignores that measles damages immunity to other infections (\"immune amnesia\"). The vaccine gives measles immunity without that damage."], "verdict": "Measles doesn't train the immune system; it erases part of what the immune system already knows."}, {"title": "\"Vitamin A treats measles, so the vaccine isn't needed\"", "tags": [["warn", "Partly true"]], "claim": "Vitamin A or cod liver oil can prevent or cure measles, making vaccination unnecessary.", "data": ["WHO recommends two doses of vitamin A for every child under 5 with measles; it may reduce deaths. There is no specific cure.", "CDC: vitamin A does not prevent measles, is not a substitute for vaccination, and too much is toxic to the liver, bones and nervous system.", "Cochrane 2022: in vitamin-A-deficient children in low- and middle-income countries, routine supplements lowered measles cases (2 trials, low certainty) but not measles deaths. There is no trial in well-nourished children.", "Texas, 2025: a Lubbock children's hospital reported several unvaccinated children with measles who also had vitamin A toxicity, often from cod liver oil (news reports)."], "problems": ["Treatment for sick or malnourished children is not prevention for everyone."], "verdict": "Vitamin A is a useful treatment under medical supervision. It does not replace the vaccine, and overdosing harms children."}, {"title": "\"Recent federal actions show MMR isn't safe\"", "tags": [["warn", "Still changing"]], "claim": "Changes in US vaccine policy in 2025–2026 show health officials now doubt MMR's safety.", "data": ["Sept 2025: the newly appointed ACIP (after all 17 previous members were removed) voted to stop recommending combined MMRV for children under 4, citing its higher seizure risk. CDC adopted it in October. Plain MMR was not affected.", "Mar 2026: a federal court (American Academy of Pediatrics v. Kennedy) stayed the 2026 schedule, the new ACIP appointments and their votes, mostly restoring the January 2025 schedules.", "Apr 2026: Secretary Kennedy told Congress MMR is safe and effective for most people.", "Aug 2026: an executive order directed HHS to offer MMR as three separate shots once such products are available. No single measles, mumps or rubella vaccine is currently sold in the US.", "17 Nov 2026: the Pan American Health Organization announced the US, Mexico and Bolivia have lost measles elimination status after sustained spread."], "problems": ["The MMRV seizure risk has been known and reflected in CDC guidance since 2010 (section 4); it is not new information about MMR.", "Splitting MMR means three injections instead of one, and delays leave children unprotected longer."], "verdict": "The one change based on safety data, MMRV, reflects a risk known since 2010. None of these actions reported new evidence of harm from MMR itself."}];
+const SOURCES = [{"t": "CDC Pink Book, Ch. 13 Measles (vaccine safety, contraindications).", "u": "https://www.cdc.gov/pinkbook/hcp/table-of-contents/chapter-13-measles.html"}, {"t": "CDC Pink Book, Ch. 15 Mumps.", "u": "https://www.cdc.gov/pinkbook/hcp/table-of-contents/chapter-15-mumps.html"}, {"t": "CDC Pink Book, Ch. 20 Rubella.", "u": "https://www.cdc.gov/pinkbook/hcp/table-of-contents/chapter-20-rubella.html"}, {"t": "ACIP. Prevention of measles, rubella, CRS and mumps, 2013. MMWR RR-62(4).", "u": "https://www.cdc.gov/mmwr/preview/mmwrhtml/rr6204a1.htm"}, {"t": "ACIP. Use of combination MMRV vaccine, 2010. MMWR RR-59(3).", "u": "https://www.cdc.gov/mmwr/preview/mmwrhtml/rr5903a1.htm"}, {"t": "CDC. MMR vaccine safety.", "u": "https://www.cdc.gov/vaccine-safety/vaccines/mmr.html"}, {"t": "CDC. Measles signs and symptoms.", "u": "https://www.cdc.gov/measles/signs-symptoms/index.html"}, {"t": "CDC. Rubella clinical overview.", "u": "https://www.cdc.gov/rubella/hcp/clinical-overview/index.html"}, {"t": "WHO. Information sheet: observed rate of vaccine reactions, MMR vaccines (2014).", "u": "https://cdn.who.int/media/docs/default-source/pvg/global-vaccine-safety/mmr-vaccine-rates-information-sheet.pdf"}, {"t": "WHO. Rubella fact sheet.", "u": "https://www.who.int/news-room/fact-sheets/detail/rubella"}, {"t": "WHO. Measles fact sheet.", "u": "https://www.who.int/news-room/fact-sheets/detail/measles"}, {"t": "Institute of Medicine. Adverse Effects of Vaccines: Evidence and Causality (2011), Ch. 4 MMR.", "u": "https://www.nationalacademies.org/read/13164/chapter/6"}, {"t": "Di Pietrantonj C et al. Vaccines for measles, mumps, rubella and varicella in children. Cochrane 2020 (updated 2021).", "u": "https://pubmed.ncbi.nlm.nih.gov/34806766/"}, {"t": "Vestergaard M et al. MMR vaccination and febrile seizures. JAMA 2004.", "u": "https://pubmed.ncbi.nlm.nih.gov/15265850/"}, {"t": "Klein NP et al. MMRV and the risk of febrile seizures. Pediatrics 2010.", "u": "https://pubmed.ncbi.nlm.nih.gov/20587679/"}, {"t": "Klein NP et al. MMRV and febrile seizures in 4–6 year olds. Pediatrics 2012.", "u": "https://pubmed.ncbi.nlm.nih.gov/22473362/"}, {"t": "Rowhani-Rahbar A et al. Effect of age on febrile seizures after measles-containing vaccines. JAMA Pediatr 2013.", "u": "https://pubmed.ncbi.nlm.nih.gov/24126936/"}, {"t": "France EK et al. Risk of immune thrombocytopenic purpura after MMR. Pediatrics 2008.", "u": "https://pubmed.ncbi.nlm.nih.gov/18310189/"}, {"t": "Mantadakis E et al. Thrombocytopenic purpura after MMR: a systematic review. J Pediatr 2010.", "u": "https://pubmed.ncbi.nlm.nih.gov/20097358/"}, {"t": "Tingle AJ et al. Randomised double-blind placebo-controlled study of rubella vaccination and joint symptoms. Lancet 1997.", "u": "https://pubmed.ncbi.nlm.nih.gov/9142061/"}, {"t": "Ray P et al. Risk of chronic arthropathy among women after rubella vaccination. JAMA 1997.", "u": "https://pubmed.ncbi.nlm.nih.gov/9268275/"}, {"t": "Miller E et al. Risk of aseptic meningitis after MMR in UK children. Lancet 1993.", "u": "https://pubmed.ncbi.nlm.nih.gov/8096942/"}, {"t": "Black S et al. Risk of aseptic meningitis after Jeryl Lynn MMR. Pediatr Infect Dis J 1997.", "u": "https://pubmed.ncbi.nlm.nih.gov/9154545/"}, {"t": "Patja A et al. Serious adverse events after MMR during 14 years of prospective follow-up. Pediatr Infect Dis J 2000.", "u": "https://pubmed.ncbi.nlm.nih.gov/11144371/"}, {"t": "Patja A et al. Risk of Guillain-Barré syndrome after MMR. J Pediatr 2001.", "u": "https://pubmed.ncbi.nlm.nih.gov/11174624/"}, {"t": "Hviid A et al. Childhood vaccination and type 1 diabetes. NEJM 2004.", "u": "https://pubmed.ncbi.nlm.nih.gov/15070789/"}, {"t": "Davis RL et al. Measles-mumps-rubella and other measles-containing vaccines do not increase the risk for IBD. Arch Pediatr Adolesc Med 2001.", "u": "https://pubmed.ncbi.nlm.nih.gov/11231801/"}, {"t": "Hviid A, Melbye M. MMR vaccination and asthma-like disease in early childhood. Am J Epidemiol 2008.", "u": "https://pubmed.ncbi.nlm.nih.gov/18845551/"}, {"t": "Castillo-Solórzano C et al. Rubella vaccination of unknowingly pregnant women during mass campaigns. J Infect Dis 2011.", "u": "https://pubmed.ncbi.nlm.nih.gov/21954271/"}, {"t": "James JM et al. Safe administration of MMR vaccine to egg-allergic children. NEJM 1995.", "u": "https://pubmed.ncbi.nlm.nih.gov/7708070/"}, {"t": "Bitnun A et al. Measles inclusion-body encephalitis caused by the vaccine strain. Clin Infect Dis 1999.", "u": "https://pubmed.ncbi.nlm.nih.gov/10589903/"}, {"t": "Miller ER et al. Deaths following vaccination: what does the evidence show? Vaccine 2015.", "u": "https://pubmed.ncbi.nlm.nih.gov/26004568/"}, {"t": "Wendorf KA et al. SSPE: the devastating measles complication more common than believed. Clin Infect Dis 2017.", "u": "https://pubmed.ncbi.nlm.nih.gov/28387784/"}, {"t": "VAERS data guide.", "u": "https://vaers.hhs.gov/data/dataguide.html"}, {"t": "Moro PL et al. Deaths reported to VAERS, 1997–2013. Clin Infect Dis 2015.", "u": "https://pubmed.ncbi.nlm.nih.gov/26021988/"}, {"t": "Sukumaran L et al. Safety of MMR vaccine in adults, VAERS 2003–2013. Clin Infect Dis 2015.", "u": "https://pubmed.ncbi.nlm.nih.gov/25637587/"}, {"t": "Cosgrove et al. Deaths following MMR and MMRV vaccination in the United States (preprint, 2026).", "u": "https://zenodo.org/records/18671462"}, {"t": "CDC. Measles cases and outbreaks.", "u": "https://www.cdc.gov/measles/data-research/index.html"}, {"t": "CDC MMWR. Measles outbreak, Texas and New Mexico, 2025.", "u": "https://www.cdc.gov/mmwr/volumes/74/wr/mm7414a1.htm"}, {"t": "HRSA. Vaccine Injury Compensation Program data.", "u": "https://www.hrsa.gov/vaccine-compensation/data"}, {"t": "Vaccine Injury Table, 42 CFR 100.3.", "u": "https://www.law.cornell.edu/cfr/text/42/100.3"}, {"t": "Greenwood KP et al. A systematic review of human-to-human transmission of measles vaccine virus. Vaccine 2016.", "u": "https://pubmed.ncbi.nlm.nih.gov/27083423/"}, {"t": "CDC Pink Book, Ch. 22 Varicella.", "u": "https://www.cdc.gov/pinkbook/hcp/table-of-contents/chapter-22-varicella.html"}, {"t": "FDA. M-M-R II prescribing information.", "u": "https://www.fda.gov/media/75191/download"}, {"t": "FDA labeling rule, 21 CFR 201.57.", "u": "https://www.law.cornell.edu/cfr/text/21/201.57"}, {"t": "Coriell Institute. WI-38 cell line (AG06814).", "u": "https://www.coriell.org/0/Sections/Search/Sample_Detail.aspx?Ref=AG06814"}, {"t": "Congregation for the Doctrine of the Faith. Note on the morality of using some anti-COVID-19 vaccines (2020), citing the 2005 and 2017 Pontifical Academy documents.", "u": "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_20201221_nota-vaccini-anticovid_en.html"}, {"t": "PolitiFact. Kennedy claims about measles vaccine, May 2025.", "u": "https://www.politifact.com/factchecks/2025/may/16/robert-f-kennedy-jr/measles-vaccine-safety-testing-immunity-fetal-debr"}, {"t": "US Court of Appeals, Third Circuit. US ex rel. Krahling v. Merck, No. 23-2553 (2024).", "u": "https://www2.ca3.uscourts.gov/opinarch/232553np.pdf"}, {"t": "Hooker BS, Miller NZ. Analysis of health outcomes in vaccinated and unvaccinated children. SAGE Open Med 2020.", "u": "https://pubmed.ncbi.nlm.nih.gov/32537156/"}, {"t": "Retraction: Lyons-Weiler J, Thomas P. IJERPH 2021.", "u": "https://pubmed.ncbi.nlm.nih.gov/34360528/"}, {"t": "Lead Stories. Michigan vaccinated vs. unvaccinated study did not pass internal review (2025).", "u": "https://leadstories.com/hoax-alert/2025/10/fact-check-michigan-study-of-vaccinated-vs-unvaccinated-children-did-not-pass-internal-methods-review.html"}, {"t": "Mina MJ et al. Long-term measles-induced immunomodulation increases overall childhood infectious disease mortality. Science 2015.", "u": "https://pubmed.ncbi.nlm.nih.gov/25954009/"}, {"t": "Mina MJ et al. Measles virus infection diminishes preexisting antibodies. Science 2019.", "u": "https://pubmed.ncbi.nlm.nih.gov/31672891/"}, {"t": "Petrova VN et al. Incomplete genetic reconstitution of B cell pools contributes to prolonged immunosuppression after measles. Sci Immunol 2019.", "u": "https://pubmed.ncbi.nlm.nih.gov/31672862/"}, {"t": "CDC. Measles clinical overview (vitamin A guidance).", "u": "https://www.cdc.gov/measles/hcp/clinical-overview/index.html"}, {"t": "Imdad A et al. Vitamin A supplementation for preventing morbidity and mortality in children 6–59 months. Cochrane 2022.", "u": "https://pubmed.ncbi.nlm.nih.gov/35294044/"}, {"t": "HealthDay. Measles outbreak leads to vitamin A toxicity (2025).", "u": "https://www.healthday.com/health-news/infectious-disease/measles-outbreak-leads-to-dangerous-vitamin-a-toxicity"}, {"t": "Congressional Research Service. ACIP and the childhood schedule (updated July 2026).", "u": "https://www.congress.gov/crs_external_products/IN/PDF/IN12684/IN12684.7.pdf"}, {"t": "White House. Executive order on childhood vaccine recommendations, August 2026.", "u": "https://www.whitehouse.gov/presidential-actions/2026/08/delivering-gold-standard-childhood-vaccine-recommendations-for-americans/"}, {"t": "PAHO. Measles elimination status, 17 November 2026.", "u": "https://www.paho.org/en/news/17-11-2026-paho-urges-countries-step-efforts-stop-measles-outbreaks-and-move-towards"}, {"t": "FactCheck.org. Timeline of mixed messaging on the measles vaccine (2026).", "u": "https://www.factcheck.org/2026/05/a-timeline-of-rfk-jr-s-mixed-messaging-on-the-measles-vaccine/"}];
+
+const SEV = {
+  mild: { t: 'Mild, goes away on its own', c: 'var(--safe)' },
+  mod: { t: 'Frightening or needs care, no lasting harm', c: 'var(--warn)' },
+  serious: { t: 'Serious', c: 'var(--claim)' },
+  gone: { t: 'Old strain, no longer used', c: 'var(--muted)' },
+};
+
+function svgEl(w, h, inner, label) { return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}">${inner}</svg>`; }
+function pills(list) { return (list || []).map(p => `<span class="pill ${p[0]}">${esc(p[1])}</span>`).join(''); }
+function oneIn(perM) { if (perM >= 1e6) return 'everyone'; const n = 1e6 / perM; const r = n >= 100 ? Math.round(n / (n >= 10000 ? 1000 : 100)) * (n >= 10000 ? 1000 : 100) : Math.round(n); return '1 in ' + fmt(r); }
+function powLab(p) { return p < 3 ? String(Math.pow(10, p)) : p < 6 ? Math.pow(10, p - 3) + 'k' : Math.pow(10, p - 6) + 'M'; }
+
+/* ================= STATS ================= */
+$('stats').innerHTML = STATS.map(s => `<div class="card stat"><div class="v ${s.cls || ''}">${esc(s.v)}</div><div class="k">${esc(s.k)}</div></div>`).join('');
+$('sevLegend').innerHTML = Object.values(SEV).map(s => `<span><i class="sw" style="background:${s.c}"></i>${esc(s.t)}</span>`).join('');
+
+/* ================= 1. RANKED EVENTS ================= */
+function drawRank() {
+  const host = $('rankChart');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 680;
+  const labelW = narrow ? 10 : 270, padR = narrow ? 14 : 30, rowH = narrow ? 60 : 40, top = 6, axisH = 26;
+  const H = top + EVENTS.length * rowH + axisH;
+  const lo = 0, hi = 6;
+  const X = v => labelW + (log10(Math.max(1, v)) - lo) / (hi - lo) * (W - labelW - padR);
+  let g = '';
+  for (let p = lo; p <= hi; p++) {
+    const x = X(Math.pow(10, p));
+    g += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - axisH}" stroke="var(--line)"/>`;
+    g += `<text x="${x}" y="${H - 8}" font-size="11" fill="var(--muted)" text-anchor="middle">${powLab(p)}</text>`;
+  }
+  EVENTS.forEach((e, i) => {
+    const y = top + i * rowH + rowH / 2;
+    const col = SEV[e.sev].c;
+    g += `<g class="row" data-i="${i}" tabindex="0" style="cursor:pointer"><rect x="0" y="${y - rowH / 2}" width="${W}" height="${rowH}" fill="transparent"/>`;
+    if (narrow) g += `<text x="${labelW}" y="${y - 15}" font-size="12" fill="var(--ink)" font-weight="600">${esc(e.label)}</text><text x="${labelW}" y="${y - 1}" font-size="11" fill="var(--muted)">${esc(e.text)}</text>`;
+    else {
+      g += `<text x="${labelW - 10}" y="${y - 3}" font-size="13" fill="var(--ink)" text-anchor="end" font-weight="600">${esc(e.label)}</text>`;
+      g += `<text x="${labelW - 10}" y="${y + 12}" font-size="11.5" fill="var(--muted)" text-anchor="end">${esc(e.text)}</text>`;
+    }
+    const yb = narrow ? y + 15 : y;
+    if (e.lo == null) {
+      g += `<text x="${X(1)}" y="${yb + 4}" font-size="11.5" fill="var(--muted)" font-style="italic">${esc(e.offscale)}</text>`;
+    } else {
+      const x0 = X(e.lo), x1 = X(e.hi);
+      if (e.upTo) g += `<line x1="${X(1)}" x2="${x1}" y1="${yb}" y2="${yb}" stroke="${col}" stroke-width="2" stroke-dasharray="3 3"/><circle cx="${x1}" cy="${yb}" r="5" fill="${col}"/>`;
+      else if (e.hi > e.lo) g += `<rect x="${x0}" y="${yb - 5}" width="${Math.max(10, x1 - x0)}" height="10" rx="5" fill="${col}"/>`;
+      else g += `<circle cx="${x0}" cy="${yb}" r="6" fill="${col}"/>`;
+    }
+    g += `</g>`;
+  });
+  host.innerHTML = svgEl(W, H, g, 'MMR side effects ranked by rate per million doses');
+  host.querySelectorAll('.row').forEach(el => {
+    const show = () => {
+      const e = EVENTS[+el.dataset.i];
+      $('rankReadout').innerHTML = `<b>${esc(e.label)}</b> · ${esc(SEV[e.sev].t)} · ${esc(e.detail)}`;
+      host.querySelectorAll('.row').forEach(o => o.style.opacity = o === el ? 1 : .45);
+    };
+    el.addEventListener('mouseenter', show); el.addEventListener('focus', show); el.addEventListener('click', show);
+  });
+  host.addEventListener('mouseleave', () => host.querySelectorAll('.row').forEach(o => o.style.opacity = 1));
+}
+
+/* ================= 2. VACCINE VS DISEASE ================= */
+function drawVs() {
+  const host = $('vsChart');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 620;
+  const labelW = narrow ? 10 : 230, padR = narrow ? 14 : 30, rowH = narrow ? 82 : 64, top = 6, axisH = 26;
+  const H = top + PAIRS.length * rowH + axisH;
+  const lo = 0, hi = 6;
+  const X = v => labelW + (log10(Math.max(1, v)) - lo) / (hi - lo) * (W - labelW - padR);
+  let g = '';
+  for (let p = lo; p <= hi; p++) {
+    const x = X(Math.pow(10, p));
+    g += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - axisH}" stroke="var(--line)"/>`;
+    g += `<text x="${x}" y="${H - 8}" font-size="11" fill="var(--muted)" text-anchor="middle">${powLab(p)}</text>`;
+  }
+  const bar = (r, y, col) => {
+    if (r.zero) return `<text x="${X(1) + 2}" y="${y + 4}" font-size="11.5" fill="${col}" font-weight="600">${esc(r.zero)}</text>`;
+    const x0 = X(r.lo), x1 = X(r.hi);
+    let s = r.hi > r.lo ? `<rect x="${x0}" y="${y - 5}" width="${Math.max(10, x1 - x0)}" height="10" rx="5" fill="${col}"/>` : `<circle cx="${x0}" cy="${y}" r="6" fill="${col}"/>`;
+    const tx = x1 + 10, txt = esc(r.text);
+    const right = tx + txt.length * 6.2 > W;
+    s += `<text x="${right ? x0 - 10 : tx}" y="${y + 4}" font-size="11.5" fill="var(--muted)" text-anchor="${right ? 'end' : 'start'}">${txt}</text>`;
+    return s;
+  };
+  PAIRS.forEach((p, i) => {
+    const y0 = top + i * rowH;
+    if (i) g += `<line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line)" stroke-dasharray="2 4"/>`;
+    if (narrow) g += `<text x="${labelW}" y="${y0 + 16}" font-size="12.5" fill="var(--ink)" font-weight="650">${esc(p.label)}</text>`;
+    else {
+      g += `<text x="${labelW - 10}" y="${y0 + rowH / 2 - 2}" font-size="13" fill="var(--ink)" text-anchor="end" font-weight="650">${esc(p.label)}</text>`;
+      g += `<text x="${labelW - 10}" y="${y0 + rowH / 2 + 13}" font-size="11.5" fill="var(--muted)" text-anchor="end">${esc(p.dis.which)}</text>`;
+    }
+    const ya = narrow ? y0 + 38 : y0 + rowH / 2 - 11, yb2 = narrow ? y0 + 62 : y0 + rowH / 2 + 11;
+    g += bar(p.vac, ya, 'var(--safe)');
+    g += bar(p.dis, yb2, 'var(--claim)');
+    if (narrow) g += `<text x="${W - padR}" y="${y0 + 16}" font-size="11" fill="var(--muted)" text-anchor="end">${esc(p.dis.which)}</text>`;
+  });
+  host.innerHTML = svgEl(W, H, g, 'Complication rates after MMR compared with after natural infection');
+  $('vsCap').textContent = VS_CAP;
+}
+
+/* ================= 3. TIMING ================= */
+function drawTime() {
+  const host = $('timeChart');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 620;
+  const labelW = narrow ? 10 : 190, padR = 14, rowH = narrow ? 46 : 34, top = 6, axisH = 30;
+  const H = top + TIMING.length * rowH + axisH;
+  const D = 42;
+  const X = d => labelW + d / D * (W - labelW - padR);
+  let g = '';
+  for (let d = 0; d <= D; d += 7) {
+    const x = X(d);
+    g += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - axisH}" stroke="var(--line)"/>`;
+    g += `<text x="${x}" y="${H - 14}" font-size="11" fill="var(--muted)" text-anchor="middle">${d === 0 ? 'shot' : 'day ' + d}</text>`;
+  }
+  g += `<text x="${X(21)}" y="${H - 1}" font-size="11" fill="var(--muted)" text-anchor="middle">days after vaccination</text>`;
+  TIMING.forEach((t, i) => {
+    const y = top + i * rowH + rowH / 2;
+    const col = SEV[t.sev].c;
+    if (narrow) g += `<text x="${labelW}" y="${y - 8}" font-size="12" fill="var(--ink)" font-weight="600">${esc(t.label)} <tspan fill="var(--muted)" font-weight="400">${esc(t.text)}</tspan></text>`;
+    else g += `<text x="${labelW - 10}" y="${y + 4}" font-size="13" fill="var(--ink)" text-anchor="end" font-weight="600">${esc(t.label)}</text>`;
+    const yb = narrow ? y + 10 : y;
+    const x0 = X(t.d0), x1 = Math.max(X(t.d1), x0 + 6);
+    g += `<rect x="${x0}" y="${yb - 6}" width="${x1 - x0}" height="12" rx="6" fill="${col}" opacity="${t.soft ? .45 : .9}" ${t.soft ? `stroke="${col}" stroke-dasharray="3 2"` : ''}/>`;
+    if (t.p0 != null) g += `<rect x="${X(t.p0)}" y="${yb - 6}" width="${X(t.p1) - X(t.p0)}" height="12" rx="6" fill="${col}"/>`;
+    if (!narrow) {
+      const tw = t.text.length * 6.2, tx = x1 + 8;
+      if (tx + tw <= W) g += `<text x="${tx}" y="${yb + 4}" font-size="11.5" fill="var(--muted)">${esc(t.text)}</text>`;
+      else if (x0 - 8 - tw >= labelW) g += `<text x="${x0 - 8}" y="${yb + 4}" font-size="11.5" fill="var(--muted)" text-anchor="end">${esc(t.text)}</text>`;
+      else g += `<text x="${(x0 + x1) / 2}" y="${yb + 4}" font-size="11.5" fill="var(--ink)" font-weight="600" text-anchor="middle">${esc(t.text)}</text>`;
+    }
+  });
+  host.innerHTML = svgEl(W, H, g, 'When MMR side effects appear, in days after vaccination');
+}
+
+/* ================= 4. STUDIES ================= */
+function drawSize() {
+  const host = $('sizeChart');
+  const W = Math.max(320, host.clientWidth);
+  const narrow = W < 560;
+  const rows = STUDIES.filter(s => s.n).sort((a, b) => a.n - b.n);
+  const labelW = narrow ? 124 : 210, padR = narrow ? 58 : 80, rowH = 28, top = 6, axisH = 24;
+  const H = top + rows.length * rowH + axisH;
+  const lo = 1, hi = 8;
+  const X = n => labelW + (log10(Math.max(10, n)) - lo) / (hi - lo) * (W - labelW - padR);
+  let g = '';
+  for (let p = lo; p <= hi; p++) {
+    const x = X(Math.pow(10, p));
+    g += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - axisH}" stroke="var(--line)"/>`;
+    if (!narrow || p % 2 === 1) g += `<text x="${x}" y="${H - 6}" font-size="11" fill="var(--muted)" text-anchor="middle">${powLab(p)}</text>`;
+  }
+  rows.forEach((s, i) => {
+    const y = top + i * rowH, bh = 16, by = y + (rowH - bh) / 2;
+    const col = s.kind === 'risk' ? 'var(--warn)' : 'var(--safe)';
+    g += `<g class="bar" data-id="${s.id}" tabindex="0" style="cursor:pointer"><rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>`;
+    g += `<text x="${labelW - 8}" y="${y + rowH / 2 + 4}" font-size="${narrow ? 11.5 : 13}" fill="var(--ink)" text-anchor="end">${esc(s.short)}</text>`;
+    g += `<rect x="${labelW}" y="${by}" width="${Math.max(2, X(s.n) - labelW)}" height="${bh}" rx="3" fill="${col}"/>`;
+    g += `<text x="${X(s.n) + 6}" y="${y + rowH / 2 + 4}" font-size="12" fill="var(--muted)">${esc(narrow ? s.nShort.replace(' (pooled)', '') : s.nShort)}</text></g>`;
+  });
+  host.innerHTML = svgEl(W, H, g, 'Sample sizes of MMR side-effect studies, log scale');
+  host.querySelectorAll('.bar').forEach(el => {
+    const show = () => {
+      const s = STUDIES.find(z => z.id === el.dataset.id);
+      $('sizeReadout').innerHTML = `<b>${esc(s.name)}</b> · ${esc(s.topic)} · ${esc(s.nText)}. ${esc(s.finding)}`;
+      host.querySelectorAll('.bar').forEach(o => o.style.opacity = o === el ? 1 : .45);
+    };
+    el.addEventListener('mouseenter', show); el.addEventListener('focus', show); el.addEventListener('click', show);
+  });
+  host.addEventListener('mouseleave', () => host.querySelectorAll('.bar').forEach(o => o.style.opacity = 1));
+}
+let filter = 'all';
+function drawMatrix() {
+  const cols = ['Study', 'Design & sample', 'Comparison group', 'How the outcome was measured', 'Bias controls', 'Funding & affiliations'];
+  let h = `<div class="srow head">${cols.map(c => `<div>${c}</div>`).join('')}</div>`;
+  for (const s of STUDIES) {
+    if (filter !== 'all' && s.kind !== filter) continue;
+    h += `<div class="srow ${s.kind}">
+      <div class="sname">${esc(s.name)}<small>${esc(s.where)}</small><div style="margin-top:6px"><span class="pill ${s.kind === 'risk' ? 'warn' : 'ok'}">${esc(s.topic)}</span></div></div>
+      <div><span class="lbl">${cols[1]}</span>${esc(s.design)}<br><b>${esc(s.nText)}</b></div>
+      <div><span class="lbl">${cols[2]}</span>${esc(s.control)}</div>
+      <div><span class="lbl">${cols[3]}</span>${esc(s.outcome)}</div>
+      <div><span class="lbl">${cols[4]}</span>${esc(s.controls)}</div>
+      <div><span class="lbl">${cols[5]}</span>${esc(s.funding)}</div>
+      <div class="sres"><b>Result:</b> ${esc(s.finding)}</div>
+    </div>`;
+  }
+  $('matrix').innerHTML = h;
+}
+document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.f;
+  document.querySelectorAll('.chip').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+  drawMatrix();
+}));
+$('fundNote').textContent = FUND_NOTE;
+
+/* ================= 5. IOM ================= */
+$('iomIntro').innerHTML = IOM.intro;
+$('iomGrid').innerHTML = IOM.groups.map(gr => `<div class="card sev-${gr.sev}"><h3>${esc(gr.title)}</h3><p class="desc">${esc(gr.desc)}</p><ul>${gr.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('');
+
+/* ================= 6. CONTRAINDICATIONS ================= */
+const CK = { no: ['Don\'t vaccinate', 'serious'], wait: ['Wait or check first', 'mod'], ok: ['Not a reason to skip', 'mild'] };
+$('contra').innerHTML = CONTRA.map(c => `<div class="card sev-${CK[c.kind][1]}"><div class="k">${CK[c.kind][0]}</div><h3 style="margin-top:4px">${esc(c.t)}</h3><p>${esc(c.text)}</p></div>`).join('');
+
+/* ================= 7. MONITORING ================= */
+$('flow').innerHTML = FLOW.steps.map(s => `<div class="card"><h3>${esc(s.t)}</h3><p>${esc(s.a)}</p><p>${esc(s.b)}</p></div>`).join('');
+$('flowCallout').innerHTML = FLOW.callout;
+
+/* ================= 8. CLAIMS ================= */
+$('claimCards').innerHTML = CLAIMS.map(d => `
+  <article class="card dive">
+    <h3>${esc(d.title)}</h3>
+    <div>${pills(d.tags)}</div>
+    <dl>
+      <dt>The claim</dt><dd>${esc(d.claim)}</dd>
+      <dt>What the data show</dt><dd><ul>${d.data.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd>
+      <dt>Problems with the reasoning</dt><dd><ul>${d.problems.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd>
+    </dl>
+    <div class="verdict"><b>Bottom line:</b> ${esc(d.verdict)}</div>
+  </article>`).join('');
+
+$('srcList').innerHTML = SOURCES.map(s => `<li>${esc(s.t)} <a href="${esc(s.u)}" rel="noopener">${esc(s.u.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a></li>`).join('');
+
+function drawAll() { drawRank(); drawVs(); drawTime(); drawSize(); }
+drawMatrix();
+drawAll();
+let rt = 0;
+new ResizeObserver(() => { cancelAnimationFrame(rt); rt = requestAnimationFrame(drawAll); }).observe(document.querySelector('.wrap'));
+window.__oneIn = oneIn;
+})();
+</script>
+</body>
+</html>
